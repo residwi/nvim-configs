@@ -7,6 +7,7 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
 vim.opt.breakindent = true
+vim.opt.smartindent = true
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -28,3 +29,8 @@ vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 8
+
+-- Correct terminal colors
+vim.opt.termguicolors = true
+
+vim.opt.colorcolumn = "80"
