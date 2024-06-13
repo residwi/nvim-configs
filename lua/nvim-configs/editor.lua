@@ -32,5 +32,3 @@ vim.opt.scrolloff = 8
 
 -- Correct terminal colors
 vim.opt.termguicolors = true
-
-vim.opt.colorcolumn = "80"
