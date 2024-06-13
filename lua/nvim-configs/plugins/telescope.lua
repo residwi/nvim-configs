@@ -36,8 +36,14 @@ return {
 
 		local builtin = require("telescope.builtin")
 		vim.keymap.set("n", "<C-p>", builtin.git_files)
-		vim.keymap.set("n", "<leader>pf", builtin.find_files)
-		vim.keymap.set("n", "<leader>ff", builtin.grep_string)
+		vim.keymap.set("n", "<leader>ff", builtin.find_files, { desc = "[F]ind [F]iles" })
+		vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "[F]ind [G]rep String" })
+		vim.keymap.set("n", "<leader>fb", function()
+			builtin.buffers({
+				sort_mru = true,
+				sort_lastused = true,
+			})
+		end, { desc = "[F]ind [B]uffers" })
 
 		vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "[F]ind [H]elp" })
 		vim.keymap.set("n", "<leader>/", function()
@@ -48,8 +54,8 @@ return {
 		end, { desc = "[/] Fuzzily search in current buffer" })
 
 		-- Shortcut for searching your Neovim configuration files
-		vim.keymap.set("n", "<leader>fn", function()
+		vim.keymap.set("n", "<leader>fc", function()
 			builtin.find_files({ cwd = vim.fn.stdpath("config") })
-		end, { desc = "[F]ind [N]eovim files" })
+		end, { desc = "[F]ind [C]onfig Neovim files" })
 	end,
 }
