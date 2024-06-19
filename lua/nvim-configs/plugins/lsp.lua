@@ -156,11 +156,6 @@ return {
 		--        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 		local servers = {
 			-- clangd = {},
-			gopls = {},
-			ruby_lsp = {},
-			rubocop = {
-				cmd = { "bundle", "exec", "rubocop", "--lsp" },
-			},
 			-- pyright = {},
 			-- rust_analyzer = {},
 			-- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -171,6 +166,16 @@ return {
 			-- But for many setups, the LSP (`tsserver`) will work just fine
 			-- tsserver = {},
 			--
+			gopls = {},
+			ruby_lsp = {},
+			rubocop = {
+				cmd = { "bundle", "exec", "rubocop", "--lsp" },
+			},
+			tailwindcss = {},
+			html = {},
+			cssls = {},
+			dockerls = {},
+			docker_compose_language_service = {},
 
 			lua_ls = {
 				settings = {
@@ -200,9 +205,23 @@ return {
 		-- for you, so that they are available from within Neovim.
 		local ensure_installed = vim.tbl_keys(servers or {})
 		vim.list_extend(ensure_installed, {
+			-- Formatters
 			"stylua", -- Used to format Lua code
-			"shfmt",
-			"shellcheck",
+			"shfmt", -- shell formatter
+			"erb-formatter", -- ERB formatter
+			"prettierd", -- prettier formatter
+			"prettier", -- prettier formatter
+			"isort", -- python formatter
+			"black", -- python formatter
+			"goimports", -- go formatter
+			"gofumpt", -- go formatter
+
+			-- Linters
+			"shellcheck", -- shell linter
+			"pylint", -- python linter
+			"eslint_d", -- javascript linter
+			"markdownlint", -- markdown linter
+			"hadolint", -- Dockerfile linter
 		})
 		require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
