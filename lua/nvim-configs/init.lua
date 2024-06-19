@@ -11,3 +11,6 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 		vim.highlight.on_yank()
 	end,
 })
+
+-- Use tree style for netrw
+vim.g.netrw_liststyle = 3
