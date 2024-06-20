@@ -6,6 +6,7 @@ return {
 		lint.linters_by_ft = {
 			sh = { "shellcheck" },
 			ruby = { "rubocop" },
+			eruby = { "erb_lint" },
 			markdown = { "markdownlint" },
 			javascript = { "eslint_d" },
 			typescript = { "eslint_d" },

@@ -208,7 +208,6 @@ return {
 			-- Formatters
 			"stylua", -- Used to format Lua code
 			"shfmt", -- shell formatter
-			"erb-formatter", -- ERB formatter
 			"prettierd", -- prettier formatter
 			"prettier", -- prettier formatter
 			"isort", -- python formatter
@@ -217,6 +216,7 @@ return {
 			"gofumpt", -- go formatter
 
 			-- Linters
+			"erb-lint", -- erb linter
 			"shellcheck", -- shell linter
 			"pylint", -- python linter
 			"eslint_d", -- javascript linter

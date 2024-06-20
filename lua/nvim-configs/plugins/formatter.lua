@@ -28,7 +28,7 @@ return {
 			sh = { "shfmt" },
 			go = { "goimports", "gofumpt" },
 			ruby = { "rubocop" },
-			eruby = { "erb_format" },
+			eruby = { "rubocop" },
 			javascript = { "prettierd", "prettier" },
 			typescript = { "prettierd", "prettier" },
 			javascriptreact = { "prettierd", "prettier" },
