@@ -23,6 +23,14 @@ return {
 				lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
 			}
 		end,
+
+		formatters = {
+			rubocop = {
+				command = "bundle",
+				prepend_args = { "exec", "rubocop" },
+			},
+		},
+
 		formatters_by_ft = {
 			lua = { "stylua" },
 			sh = { "shfmt" },
