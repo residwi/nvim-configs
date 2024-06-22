@@ -14,3 +14,5 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 
 -- Use tree style for netrw
 vim.g.netrw_liststyle = 3
+
+vim.cmd.colorscheme("catppuccin-mocha")
