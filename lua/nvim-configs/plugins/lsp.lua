@@ -171,7 +171,18 @@ return {
 			rubocop = {
 				cmd = { "bundle", "exec", "rubocop", "--lsp" },
 			},
-			tailwindcss = {},
+			tailwindcss = {
+				settings = {
+					tailwindCSS = {
+						experimental = {
+							classRegex = {
+								[[\bclass:\s*'([^']*)']],
+								[[\bclass:\s*\"([^"]*)"]],
+							},
+						},
+					},
+				},
+			},
 			html = {},
 			cssls = {},
 			dockerls = {},
