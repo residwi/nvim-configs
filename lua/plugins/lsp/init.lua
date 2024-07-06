@@ -65,6 +65,7 @@ return {
 				dockerls = {},
 				docker_compose_language_service = {},
 				lua_ls = require("plugins.lsp.servers.lua_ls"),
+				eslint = require("plugins.lsp.servers.eslint"),
 			}
 
 			require("mason-lspconfig").setup({
