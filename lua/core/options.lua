@@ -1,3 +1,5 @@
+vim.g.have_nerd_font = true
+
 vim.opt.number = true
 vim.opt.relativenumber = true
 
@@ -36,3 +38,6 @@ vim.opt.termguicolors = true
 -- search settings
 vim.opt.ignorecase = true -- ignore case when searching
 vim.opt.smartcase = true -- if you include mixed case in your search, assumes you want case-sensitive
+
+-- Use tree style for netrw
+vim.g.netrw_liststyle = 3
