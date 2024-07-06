@@ -66,6 +66,8 @@ return {
 				"docker_compose_language_service",
 				"lua_ls",
 				"eslint",
+				"jsonls",
+				"yamlls",
 			}
 
 			local configured_servers = {}
@@ -92,5 +94,10 @@ return {
 				},
 			})
 		end,
+	},
+	{
+		"b0o/SchemaStore.nvim",
+		lazy = true,
+		version = false,
 	},
 }
