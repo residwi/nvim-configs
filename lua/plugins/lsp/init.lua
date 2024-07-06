@@ -56,23 +56,33 @@ return {
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 
 			local servers = {
-				gopls = {},
-				ruby_lsp = {},
-				rubocop = require("plugins.lsp.servers.rubocop"),
-				tailwindcss = require("plugins.lsp.servers.tailwindcss"),
-				html = {},
-				cssls = {},
-				dockerls = {},
-				docker_compose_language_service = {},
-				lua_ls = require("plugins.lsp.servers.lua_ls"),
-				eslint = require("plugins.lsp.servers.eslint"),
+				"gopls",
+				"ruby_lsp",
+				"rubocop",
+				"tailwindcss",
+				"html",
+				"cssls",
+				"dockerls",
+				"docker_compose_language_service",
+				"lua_ls",
+				"eslint",
 			}
 
+			local configured_servers = {}
+			for _, server in ipairs(servers) do
+				local ok, lsp = pcall(require, "plugins.lsp.servers." .. server)
+				if ok then
+					configured_servers[server] = lsp.config
+				else
+					configured_servers[server] = {}
+				end
+			end
+
 			require("mason-lspconfig").setup({
-				ensure_installed = vim.tbl_keys(servers),
+				ensure_installed = vim.tbl_keys(configured_servers),
 				handlers = {
 					function(server_name)
-						local server = servers[server_name] or {}
+						local server = configured_servers[server_name] or {}
 						-- This handles overriding only values explicitly passed
 						-- by the server configuration above. Useful when disabling
 						-- certain features of an LSP (for example, turning off formatting for tsserver)
