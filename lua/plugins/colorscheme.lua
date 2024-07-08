@@ -3,6 +3,22 @@ return {
 		"catppuccin/nvim",
 		name = "catppuccin",
 		priority = 1000,
+		opts = {
+			integrations = {
+				native_lsp = {
+					underlines = {
+						errors = { "undercurl" },
+						hints = { "undercurl" },
+						warnings = { "undercurl" },
+						information = { "undercurl" },
+						ok = { "undercurl" },
+					},
+				},
+			},
+		},
+		config = function(_, opts)
+			require("catppuccin").setup(opts)
+		end,
 	},
 	{
 		"folke/tokyonight.nvim",
