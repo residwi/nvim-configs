@@ -11,6 +11,7 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 -- Clear highlight search on pressing <Esc> in normal mode
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+vim.keymap.set("n", "<C-c>", "<cmd>nohlsearch<CR>")
 
 -- Centered vertical scrolling
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
