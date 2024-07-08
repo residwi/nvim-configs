@@ -22,3 +22,12 @@ vim.keymap.set("n", "<C-h>", "<C-w>h")
 vim.keymap.set("n", "<C-j>", "<C-w>j")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
 vim.keymap.set("n", "<C-l>", "<C-w>l")
+
+-- buffers
+vim.keymap.set("n", "<leader>bd", "<cmd>bd<CR>")
+vim.keymap.set("n", "<S-h>", "<cmd>bprevious<CR>")
+vim.keymap.set("n", "<S-l>", "<cmd>bnext<CR>")
+vim.keymap.set("n", "[b", "<cmd>bprevious<CR>")
+vim.keymap.set("n", "]b", "<cmd>bnext<CR>")
+vim.keymap.set("n", "<leader>bb", "<cmd>e #<CR>")
+vim.keymap.set("n", "<leader>`", "<cmd>e #<CR>")
