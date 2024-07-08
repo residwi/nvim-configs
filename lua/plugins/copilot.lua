@@ -17,8 +17,10 @@ return {
 
 	{
 		"zbirenbaum/copilot-cmp",
-		config = function()
-			require("copilot_cmp").setup()
+		dependencies = "copilot.lua",
+		opts = {},
+		config = function(_, opts)
+			require("copilot_cmp").setup(opts)
 		end,
 	},
 }
