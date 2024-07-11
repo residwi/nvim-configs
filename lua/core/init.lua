@@ -57,6 +57,7 @@ require("lazy").setup({
 		{ import = "plugins.mason" },
 		{ import = "plugins" },
 		{ import = "plugins.lsp.lang.typescript" },
+		{ import = "plugins.lsp.lang.go" },
 	},
 	change_detection = { notify = false },
 })
