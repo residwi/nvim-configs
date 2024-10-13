@@ -27,12 +27,12 @@ return {
 		"hrsh7th/cmp-path",
 		"hrsh7th/cmp-buffer",
 	},
-	config = function()
+	opts = function()
 		local cmp = require("cmp")
 		local luasnip = require("luasnip")
 		luasnip.config.setup({})
 
-		cmp.setup({
+		return {
 			snippet = {
 				expand = function(args)
 					luasnip.lsp_expand(args.body)
@@ -86,14 +86,14 @@ return {
 				-- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
 				--    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
 			}),
-			sources = {
-				{ name = "lazydev", group_index = 0 }, -- set group index to 0 to skip loading LuaLS completions
-				{ name = "nvim_lsp", group_index = 1 },
-				{ name = "copilot", group_index = 2 },
-				{ name = "luasnip", group_index = 3 },
-				{ name = "path", group_index = 3 },
-				{ name = "buffer", group_index = 3 },
-			},
-		})
+			sources = cmp.config.sources({
+				{ name = "nvim_lsp" },
+				{ name = "path" },
+			}, {
+				{ name = "buffer" },
+			}, {
+				{ name = "luasnip" },
+			}),
+		}
 	end,
 }

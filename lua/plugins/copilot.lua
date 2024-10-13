@@ -14,13 +14,23 @@ return {
 			})
 		end,
 	},
-
 	{
-		"zbirenbaum/copilot-cmp",
-		dependencies = "copilot.lua",
-		opts = {},
-		config = function(_, opts)
-			require("copilot_cmp").setup(opts)
+		"hrsh7th/nvim-cmp",
+		dependencies = {
+			{
+				"zbirenbaum/copilot-cmp",
+				dependencies = "copilot.lua",
+				config = function()
+					require("copilot_cmp").setup()
+				end
+			},
+		},
+		opts = function(_, opts)
+			table.insert(opts.sources, 1, {
+				name = "copilot",
+				group_index = 1,
+				priority = 100,
+			})
 		end,
 	},
 }
