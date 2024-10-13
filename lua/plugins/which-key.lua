@@ -1,22 +1,58 @@
 return {
 	"folke/which-key.nvim",
-	event = "VimEnter", -- Sets the loading event to 'VimEnter'
-	config = function() -- This is the function that runs, AFTER loading
-		require("which-key").setup()
-
-		-- Document existing key chains
-		require("which-key").register({
-			["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-			["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-			["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-			["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-			["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
-			["<leader>t"] = { name = "[T]oggle", _ = "which_key_ignore" },
-			["<leader>h"] = { name = "Git [H]unk", _ = "which_key_ignore" },
-		})
-		-- visual mode
-		require("which-key").register({
-			["<leader>h"] = { "Git [H]unk" },
-		}, { mode = "v" })
+	event = "VeryLazy",
+	opts = {
+		defaults = {},
+		spec = {
+			{
+				mode = { "n", "v" },
+				{ "<leader><tab>", group = "tabs" },
+				{ "<leader>c", group = "code" },
+				{ "<leader>f", group = "file/find" },
+				{ "<leader>g", group = "git" },
+				{ "<leader>x", group = "diagnostics/quickfix", icon = { icon = "󱖫 ", color = "green" } },
+				{ "[", group = "prev" },
+				{ "]", group = "next" },
+				{ "g", group = "goto" },
+				{ "z", group = "fold" },
+				{
+					"<leader>b",
+					group = "buffer",
+					expand = function()
+						return require("which-key.extras").expand.buf()
+					end,
+				},
+				{
+					"<leader>w",
+					group = "windows",
+					proxy = "<c-w>",
+					expand = function()
+						return require("which-key.extras").expand.win()
+					end,
+				},
+				-- better descriptions
+				{ "gx", desc = "Open with system app" },
+			},
+		},
+	},
+	keys = {
+		{
+			"<leader>?",
+			function()
+				require("which-key").show({ global = false })
+			end,
+			desc = "Buffer Keymaps (which-key)",
+		},
+		{
+			"<c-w><space>",
+			function()
+				require("which-key").show({ keys = "<c-w>", loop = true })
+			end,
+			desc = "Window Hydra Mode (which-key)",
+		},
+	},
+	config = function(_, opts)
+		local wk = require("which-key")
+		wk.setup(opts)
 	end,
 }
