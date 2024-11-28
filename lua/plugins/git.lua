@@ -1,6 +1,7 @@
 return {
 	{
 		"lewis6991/gitsigns.nvim",
+		event = "LazyFile",
 		opts = {
 			signs = {
 				add = { text = "+" },
@@ -8,6 +9,13 @@ return {
 				delete = { text = "_" },
 				topdelete = { text = "‾" },
 				changedelete = { text = "~" },
+			},
+			signs_staged = {
+				add = { text = "▎" },
+				change = { text = "▎" },
+				delete = { text = "" },
+				topdelete = { text = "" },
+				changedelete = { text = "▎" },
 			},
 
 			on_attach = function(bufnr)
@@ -51,11 +59,11 @@ return {
 				map("n", "<leader>hS", gitsigns.stage_buffer, { desc = "git [S]tage buffer" })
 				map("n", "<leader>hu", gitsigns.undo_stage_hunk, { desc = "git [u]ndo stage hunk" })
 				map("n", "<leader>hR", gitsigns.reset_buffer, { desc = "git [R]eset buffer" })
-				map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "git [p]review hunk" })
+				map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "git [p]review hunk inline" })
 				map("n", "<leader>hb", gitsigns.blame_line, { desc = "git [b]lame line" })
 				map("n", "<leader>hd", gitsigns.diffthis, { desc = "git [d]iff against index" })
 				map("n", "<leader>hD", function()
-					gitsigns.diffthis("@")
+					gitsigns.diffthis("~")
 				end, { desc = "git [D]iff against last commit" })
 
 				-- Toggles
