@@ -1,65 +1,104 @@
+local lsp_util = require("plugins.lsp.util")
+
 local M = {}
 
-function M.get(event)
-	-- NOTE: Remember that Lua is a real programming language, and as such it is possible
-	-- to define small helper and utility functions so you don't have to repeat yourself.
-	--
-	-- In this case, we create a function that lets us more easily define mappings specific
-	-- for LSP related items. It sets the mode, buffer and description for us each time.
-	local map = function(keys, func, desc)
-		vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+---@type LazyKeysLspSpec[]|nil
+M._keys = nil
+
+---@alias LazyKeysLspSpec LazyKeysSpec|{has?:string|string[], cond?:fun():boolean}
+---@alias LazyKeysLsp LazyKeys|{has?:string|string[], cond?:fun():boolean}
+
+---@return LazyKeysLspSpec[]
+function M.get()
+	if M._keys then
+		return M._keys
 	end
 
-	-- Jump to the definition of the word under your cursor.
-	--  This is where a variable was first declared, or where a function is defined, etc.
-	--  To jump back, press <C-t>.
-	map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
+	local telescope = require("telescope.builtin")
 
-	-- Find references for the word under your cursor.
-	map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+	-- stylua: ignore
+	M._keys =  {
+		{ "gd", telescope.lsp_definitions, desc = "LSP: [G]oto [D]efinition", has = "definition" },
+		{ "gr", telescope.lsp_references, desc = "LSP: [G]oto [R]eferences", nowait = true },
+		{ "gI", telescope.lsp_implementations, desc = "LSP: [G]oto [I]mplementation" },
+		{ "gy", telescope.lsp_type_definitions, desc = "LSP: [G]oto T[y]pe Definition" },
+		{ "gD", vim.lsp.buf.declaration, desc = "LSP: [G]oto [D]eclaration" },
+		{ "K", function() return vim.lsp.buf.hover() end, desc = "LSP: Hover" },
+		{ "gK", function() return vim.lsp.buf.signature_help() end, desc = "LSP: Signature Help", has = "signatureHelp" },
+		{ "<c-k>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "LSP: Signature Help", has = "signatureHelp" },
+		{ "<leader>ca", vim.lsp.buf.code_action, desc = "LSP: [C]ode [A]ction", mode = { "n", "v" }, has = "codeAction" },
+		{ "<leader>cc", vim.lsp.codelens.run, desc = "LSP: Run Codelens", mode = { "n", "v" }, has = "codeLens" },
+		{ "<leader>cC", vim.lsp.codelens.refresh, desc = "LSP: Refresh & Display Codelens", mode = { "n" }, has = "codeLens" },
+		{ "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File", mode ={"n"}, has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
+		{ "<leader>cr", vim.lsp.buf.rename, desc = "LSP: [R]ename", has = "rename" },
+		{ "<leader>cA", lsp_util.action.source, desc = "LSP: Source Action", has = "codeAction" },
+		{ "<leader>cs", function() telescope.lsp_document_symbols({ symbols = lsp_util.get_kind_filter() }) end, desc = "LSP: Goto [S]ymbol", has = "textDocument/documentSymbol" },
+		{ "<leader>cS", function() telescope.lsp_workspace_symbols({ symbols = lsp_util.get_kind_filter() }) end, desc = "LSP: Goto [S]ymbol Workspace", has = "workspace/symbol" },
+		{ "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight",
+			desc = "LSP: Next Reference", cond = function() return Snacks.words.is_enabled() end },
+		{ "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight",
+			desc = "LSP: Prev Reference", cond = function() return Snacks.words.is_enabled() end },
+		{ "<A-n>", function() Snacks.words.jump(vim.v.count1, true) end, has = "documentHighlight",
+			desc = "LSP: Next Reference", cond = function() return Snacks.words.is_enabled() end },
+		{ "<A-p>", function() Snacks.words.jump(-vim.v.count1, true) end, has = "documentHighlight",
+			desc = "LSP: Prev Reference", cond = function() return Snacks.words.is_enabled() end },
+	}
 
-	-- Jump to the implementation of the word under your cursor.
-	--  Useful when your language has ways of declaring types without an actual implementation.
-	map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
+	return M._keys
+end
 
-	-- Jump to the type of the word under your cursor.
-	--  Useful when you're not sure what type a variable is and you want to see
-	--  the definition of its *type*, not where it was *defined*.
-	map("<leader>D", require("telescope.builtin").lsp_type_definitions, "Type [D]efinition")
+---@param method string|string[]
+function M.has(buffer, method)
+	if type(method) == "table" then
+		for _, m in ipairs(method) do
+			if M.has(buffer, m) then
+				return true
+			end
+		end
+		return false
+	end
+	method = method:find("/") and method or "textDocument/" .. method
+	local clients = lsp_util.get_clients({ bufnr = buffer })
+	for _, client in ipairs(clients) do
+		if client.supports_method(method) then
+			return true
+		end
+	end
+	return false
+end
 
-	-- Fuzzy find all the symbols in your current document.
-	--  Symbols are things like variables, functions, types, etc.
-	map("<leader>ds", require("telescope.builtin").lsp_document_symbols, "[D]ocument [S]ymbols")
+---@return LazyKeysLsp[]
+function M.resolve(buffer)
+	local Keys = require("lazy.core.handler.keys")
+	if not Keys.resolve then
+		return {}
+	end
+	local spec = vim.tbl_extend("force", {}, M.get())
+	local opts = Util.opts("nvim-lspconfig")
+	local clients = lsp_util.get_clients({ bufnr = buffer })
+	for _, client in ipairs(clients) do
+		local maps = opts.servers[client.name] and opts.servers[client.name].keys or {}
+		vim.list_extend(spec, maps)
+	end
+	return Keys.resolve(spec)
+end
 
-	-- Fuzzy find all the symbols in your current workspace.
-	--  Similar to document symbols, except searches over your entire project.
-	map("<leader>ws", require("telescope.builtin").lsp_dynamic_workspace_symbols, "[W]orkspace [S]ymbols")
+function M.on_attach(_, buffer)
+	local Keys = require("lazy.core.handler.keys")
+	local keymaps = M.resolve(buffer)
 
-	-- Rename the variable under your cursor.
-	--  Most Language Servers support renaming across files, etc.
-	map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+	for _, keys in pairs(keymaps) do
+		local has = not keys.has or M.has(buffer, keys.has)
+		local cond = not (keys.cond == false or ((type(keys.cond) == "function") and not keys.cond()))
 
-	-- Execute a code action, usually your cursor needs to be on top of an error
-	-- or a suggestion from your LSP for this to activate.
-	map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-
-	-- Opens a popup that displays documentation about the word under your cursor
-	--  See `:help K` for why this keymap.
-	map("K", vim.lsp.buf.hover, "Hover Documentation")
-
-	-- WARN: This is not Goto Definition, this is Goto Declaration.
-	--  For example, in C this would take you to the header.
-	map("gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-
-	-- The following autocommand is used to enable inlay hints in your
-	-- code, if the language server you are using supports them
-	--
-	-- This may be unwanted, since they displace some of your code
-	local client = vim.lsp.get_client_by_id(event.data.client_id)
-	if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-		map("<leader>th", function()
-			vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-		end, "[T]oggle Inlay [H]ints")
+		if has and cond then
+			local opts = Keys.opts(keys)
+			opts.cond = nil
+			opts.has = nil
+			opts.silent = opts.silent ~= false
+			opts.buffer = buffer
+			vim.keymap.set(keys.mode or "n", keys.lhs, keys.rhs, opts)
+		end
 	end
 end
 

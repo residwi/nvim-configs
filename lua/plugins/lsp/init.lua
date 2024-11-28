@@ -1,3 +1,10 @@
+local diagnotics_icons = {
+	Error = " ",
+	Warn = " ",
+	Hint = " ",
+	Info = " ",
+}
+
 return {
 	{
 		"neovim/nvim-lspconfig",
@@ -11,51 +18,50 @@ return {
 			-- NOTE: `opts = {}` is the same as calling `require("fidget").setup({})`
 			{ "j-hui/fidget.nvim", opts = {} },
 		},
-		config = function()
-			vim.api.nvim_create_autocmd("LspAttach", {
-				group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
-				callback = function(event)
-					require("plugins.lsp.keymaps").get(event)
-
-					-- The following two autocommands are used to highlight references of the
-					-- word under your cursor when your cursor rests there for a little while.
-					--    See `:help CursorHold` for information about when this is executed
-					--
-					-- When you move your cursor, the highlights will be cleared (the second autocommand).
-					local client = vim.lsp.get_client_by_id(event.data.client_id)
-					if client and client.server_capabilities.documentHighlightProvider then
-						local highlight_augroup = vim.api.nvim_create_augroup("lsp-highlight", { clear = false })
-						vim.api.nvim_create_autocmd({ "CursorHold", "CursorHoldI" }, {
-							buffer = event.buf,
-							group = highlight_augroup,
-							callback = vim.lsp.buf.document_highlight,
-						})
-
-						vim.api.nvim_create_autocmd({ "CursorMoved", "CursorMovedI" }, {
-							buffer = event.buf,
-							group = highlight_augroup,
-							callback = vim.lsp.buf.clear_references,
-						})
-
-						vim.api.nvim_create_autocmd("LspDetach", {
-							group = vim.api.nvim_create_augroup("lsp-detach", { clear = true }),
-							callback = function(event2)
-								vim.lsp.buf.clear_references()
-								vim.api.nvim_clear_autocmds({ group = "lsp-highlight", buffer = event2.buf })
-							end,
-						})
-					end
-				end,
-			})
-
-			-- LSP servers and clients are able to communicate to each other what features they support.
-			--  By default, Neovim doesn't support everything that is in the LSP specification.
-			--  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
-			--  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
-			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
-			local servers = {
+		opts = {
+			-- options for vim.diagnostic.config()
+			---@type vim.diagnostic.Opts
+			diagnostics = {
+				underline = true,
+				update_in_insert = false,
+				virtual_text = {
+					spacing = 4,
+					source = "if_many",
+					prefix = "icons",
+				},
+				severity_sort = true,
+				signs = {
+					text = {
+						[vim.diagnostic.severity.ERROR] = diagnotics_icons.Error,
+						[vim.diagnostic.severity.WARN] = diagnotics_icons.Warn,
+						[vim.diagnostic.severity.HINT] = diagnotics_icons.Hint,
+						[vim.diagnostic.severity.INFO] = diagnotics_icons.Info,
+					},
+				},
+			},
+			-- Enable this to enable the builtin LSP inlay hints on Neovim >= 0.10.0
+			-- Be aware that you also will need to properly configure your LSP server to
+			-- provide the inlay hints.
+			inlay_hints = {
+				enabled = true,
+				exclude = { "vue" }, -- filetypes for which you don't want to enable inlay hints
+			},
+			-- Enable this to enable the builtin LSP code lenses on Neovim >= 0.10.0
+			-- Be aware that you also will need to properly configure your LSP server to
+			-- provide the code lenses.
+			codelens = {
+				enabled = false,
+			},
+			-- add any global capabilities here
+			capabilities = {
+				workspace = {
+					fileOperations = {
+						didRename = true,
+						willRename = true,
+					},
+				},
+			},
+			servers = {
 				"gopls",
 				"ruby_lsp",
 				"rubocop",
@@ -68,31 +74,135 @@ return {
 				"eslint",
 				"jsonls",
 				"yamlls",
-			}
+			},
+			-- you can do any additional lsp server setup here
+			-- return true if you don't want this server to be setup with lspconfig
+			---@type table<string, fun(server:string, opts:_.lspconfig.options):boolean?>
+			setup = {
+				-- example to setup with typescript.nvim
+				-- tsserver = function(_, opts)
+				--   require("typescript").setup({ server = opts })
+				--   return true
+				-- end,
+				-- Specify * to use this function as a fallback for any server
+				-- ["*"] = function(server, opts) end,
+			},
+		},
 
-			local configured_servers = {}
-			for _, server in ipairs(servers) do
-				local ok, lsp = pcall(require, "plugins.lsp.servers." .. server)
-				if ok then
-					configured_servers[server] = lsp.config
-				else
-					configured_servers[server] = {}
+		config = function(_, opts)
+			local lsp_util = require("plugins.lsp.util")
+
+			-- setup keymaps
+			lsp_util.on_attach(function(client, buffer)
+				require("plugins.lsp.keymaps").on_attach(client, buffer)
+			end)
+
+			lsp_util.setup()
+			lsp_util.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
+
+			-- inlay hints
+			if opts.inlay_hints.enabled then
+				lsp_util.on_supports_method("textDocument/inlayHint", function(client, buffer)
+					if
+						vim.api.nvim_buf_is_valid(buffer)
+						and vim.bo[buffer].buftype == ""
+						and not vim.tbl_contains(opts.inlay_hints.exclude, vim.bo[buffer].filetype)
+					then
+						vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+					end
+				end)
+			end
+
+			-- code lens
+			if opts.codelens.enabled and vim.lsp.codelens then
+				lsp_util.on_supports_method("textDocument/codeLens", function(client, buffer)
+					vim.lsp.codelens.refresh()
+					vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
+						buffer = buffer,
+						callback = vim.lsp.codelens.refresh,
+					})
+				end)
+			end
+
+			if type(opts.diagnostics.virtual_text) == "table" and opts.diagnostics.virtual_text.prefix == "icons" then
+				opts.diagnostics.virtual_text.prefix = function(diagnostic)
+					for d, icon in pairs(diagnotics_icons) do
+						if diagnostic.severity == vim.diagnostic.severity[d:upper()] then
+							return icon
+						end
+					end
 				end
 			end
 
-			require("mason-lspconfig").setup({
-				ensure_installed = vim.tbl_keys(configured_servers),
-				handlers = {
-					function(server_name)
-						local server = configured_servers[server_name] or {}
-						-- This handles overriding only values explicitly passed
-						-- by the server configuration above. Useful when disabling
-						-- certain features of an LSP (for example, turning off formatting for tsserver)
-						server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
-						require("lspconfig")[server_name].setup(server)
-					end,
-				},
-			})
+			vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
+
+			local servers = {}
+			for _, server in ipairs(opts.servers) do
+				local exists, lsp = pcall(require, "plugins.lsp.servers." .. server)
+				servers[server] = exists and lsp.config or {}
+			end
+
+			local has_cmp, cmp_nvim_lsp = pcall(require, "cmp_nvim_lsp")
+			local capabilities = vim.tbl_deep_extend(
+				"force",
+				{},
+				vim.lsp.protocol.make_client_capabilities(),
+				has_cmp and cmp_nvim_lsp.default_capabilities() or {},
+				opts.capabilities or {}
+			)
+
+			local function setup(server)
+				local server_opts = vim.tbl_deep_extend("force", {
+					capabilities = vim.deepcopy(capabilities),
+				}, servers[server] or {})
+				if server_opts.enabled == false then
+					return
+				end
+
+				if opts.setup[server] then
+					if opts.setup[server](server, server_opts) then
+						return
+					end
+				elseif opts.setup["*"] then
+					if opts.setup["*"](server, server_opts) then
+						return
+					end
+				end
+				require("lspconfig")[server].setup(server_opts)
+			end
+
+			-- get all the servers that are available through mason-lspconfig
+			local have_mason, mlsp = pcall(require, "mason-lspconfig")
+			local all_mslp_servers = {}
+			if have_mason then
+				all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+			end
+
+			local ensure_installed = {} ---@type string[]
+			for server, server_opts in pairs(servers) do
+				if server_opts then
+					server_opts = server_opts == true and {} or server_opts
+					if server_opts.enabled ~= false then
+						-- run manual setup if mason=false or if this is a server that cannot be installed with mason-lspconfig
+						if server_opts.mason == false or not vim.tbl_contains(all_mslp_servers, server) then
+							setup(server)
+						else
+							ensure_installed[#ensure_installed + 1] = server
+						end
+					end
+				end
+			end
+
+			if have_mason then
+				mlsp.setup({
+					ensure_installed = vim.tbl_deep_extend(
+						"force",
+						ensure_installed,
+						Util.opts("mason-lspconfig.nvim").ensure_installed or {}
+					),
+					handlers = { setup },
+				})
+			end
 		end,
 	},
 	{
