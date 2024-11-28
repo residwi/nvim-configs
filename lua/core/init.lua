@@ -22,8 +22,11 @@ local lazy_file_events = { "BufReadPost", "BufNewFile", "BufWritePre" }
 Event.mappings.LazyFile = { id = "LazyFile", event = lazy_file_events }
 Event.mappings["User LazyFile"] = Event.mappings.LazyFile
 
+_G.Util = require("core.util")
+
 require("lazy").setup({
 	spec = {
+		{ import = "plugins.snacks" },
 		-- Import mason plugin first so other plugins can override it
 		-- and ensure LSP servers, formatters and linters are installed
 		{ import = "plugins.mason" },
