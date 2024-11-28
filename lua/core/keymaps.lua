@@ -31,3 +31,9 @@ vim.keymap.set("n", "[b", "<cmd>bprevious<CR>")
 vim.keymap.set("n", "]b", "<cmd>bnext<CR>")
 vim.keymap.set("n", "<leader>bb", "<cmd>e #<CR>")
 vim.keymap.set("n", "<leader>`", "<cmd>e #<CR>")
+
+-- search selected text
+vim.keymap.set("v", "<C-n>", "y/\\V<C-R>=escape(@\",'/\\')<CR><CR>")
+
+-- Paste without replacing the current selection
+vim.keymap.set("x", "<leader>p", [["_dP`[v`]=]])
