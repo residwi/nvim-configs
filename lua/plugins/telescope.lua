@@ -1,60 +1,103 @@
+local build_cmd ---@type string?
+for _, cmd in ipairs({ "make", "cmake", "gmake" }) do
+	if vim.fn.executable(cmd) == 1 then
+		build_cmd = cmd
+		break
+	end
+end
+
 return {
 	"nvim-telescope/telescope.nvim",
+	version = false, -- telescope did only one release, so use HEAD for now
 	event = "VimEnter",
-	branch = "0.1.x",
 	dependencies = {
 		"nvim-lua/plenary.nvim",
 		{
 			"nvim-telescope/telescope-fzf-native.nvim",
-
-			-- `build` is used to run some command when the plugin is installed/updated.
-			-- This is only run then, not every time Neovim starts up.
-			build = "make",
-
-			-- `cond` is a condition used to determine whether this plugin should be
-			-- installed and loaded.
-			cond = function()
-				return vim.fn.executable("make") == 1
+			build = (build_cmd ~= "cmake") and "make"
+				or "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release && cmake --install build --prefix build",
+			enabled = build_cmd ~= nil,
+			config = function(plugin)
+				Util.on_load("telescope.nvim", function()
+					local ok, err = pcall(require("telescope").load_extension, "fzf")
+					if not ok then
+						local lib = plugin.dir .. "/build/libfzf." .. (Util.is_win() and "dll" or "so")
+						if not vim.uv.fs_stat(lib) then
+							Snacks.notify.warn("`telescope-fzf-native.nvim` not built. Rebuilding...")
+							require("lazy").build({ plugins = { plugin }, show = false }):wait(function()
+								Snacks.notify.info(
+									"Rebuilding `telescope-fzf-native.nvim` done.\nPlease restart Neovim."
+								)
+							end)
+						else
+							Snacks.notify.error("Failed to load `telescope-fzf-native.nvim`:\n" .. err)
+						end
+					end
+				end)
 			end,
 		},
-		{ "nvim-telescope/telescope-ui-select.nvim" },
-		{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
 	},
-	config = function()
-		-- [[ Configure Telescope ]]
-		require("telescope").setup({
-			extensions = {
-				["ui-select"] = {
-					require("telescope.themes").get_dropdown(),
+	-- stylua: ignore
+	keys = {
+		{ "<C-p>", "<cmd>Telescope find_files<cr>" },
+		{ "<leader>fb", "<cmd>Telescope buffers sort_mru=true sort_lastused=true ignore_current_buffer=true<cr>", desc = "[F]ind [B]uffers" },
+		{ "<leader>fc", function() require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") }) end, { desc = "[F]ind [C]onfig Neovim files" }},
+		{ "<leader>fg", function() require("telescope.builtin").live_grep() end, { desc = "[F]ind [G]rep" }},
+		{ "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "[F]ind [H]elp" },
+		{ "<leader>fw", "<cmd>Telescope grep_string<cr>",mode = {"n", "v"}, desc = "[F]ind selection [W]ord" },
+		{
+			"<leader>/",
+			function()
+				require("telescope.builtin").current_buffer_fuzzy_find(
+					require("telescope.themes").get_dropdown({ winblend = 10, previewer = false })
+				)
+			end, { desc = "[/] Fuzzily search in current buffer" }
+		},
+	},
+	opts = function()
+		local actions = require("telescope.actions")
+
+		local function find_command()
+			if 1 == vim.fn.executable("rg") then
+				return { "rg", "--files", "--color", "never", "-g", "!.git" }
+			elseif 1 == vim.fn.executable("fd") then
+				return { "fd", "--type", "f", "--color", "never", "-E", ".git" }
+			elseif 1 == vim.fn.executable("fdfind") then
+				return { "fdfind", "--type", "f", "--color", "never", "-E", ".git" }
+			elseif 1 == vim.fn.executable("find") and vim.fn.has("win32") == 0 then
+				return { "find", ".", "-type", "f" }
+			elseif 1 == vim.fn.executable("where") then
+				return { "where", "/r", ".", "*" }
+			end
+		end
+
+		return {
+			defaults = {
+				-- open files in the first window that is an actual file.
+				-- use the current window if no other window is available.
+				get_selection_window = function()
+					local wins = vim.api.nvim_list_wins()
+					table.insert(wins, 1, vim.api.nvim_get_current_win())
+					for _, win in ipairs(wins) do
+						local buf = vim.api.nvim_win_get_buf(win)
+						if vim.bo[buf].buftype == "" then
+							return win
+						end
+					end
+					return 0
+				end,
+				mappings = {
+					n = {
+						["q"] = actions.close,
+					},
 				},
 			},
-		})
-
-		-- Enable Telescope extensions if they are installed
-		pcall(require("telescope").load_extension, "fzf")
-		pcall(require("telescope").load_extension, "ui-select")
-
-		local builtin = require("telescope.builtin")
-		vim.keymap.set("n", "<C-p>", builtin.find_files)
-		vim.keymap.set("n", "<leader>fg", builtin.live_grep, { desc = "[F]ind [G]rep String" })
-		vim.keymap.set("n", "<leader>fb", function()
-			builtin.buffers({
-				sort_mru = true,
-				sort_lastused = true,
-			})
-		end, { desc = "[F]ind [B]uffers" })
-
-		vim.keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "[F]ind [H]elp" })
-		vim.keymap.set("n", "<leader>/", function()
-			builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-				winblend = 10,
-				previewer = false,
-			}))
-		end, { desc = "[/] Fuzzily search in current buffer" })
-
-		-- Shortcut for searching your Neovim configuration files
-		vim.keymap.set("n", "<leader>fc", function()
-			builtin.find_files({ cwd = vim.fn.stdpath("config") })
-		end, { desc = "[F]ind [C]onfig Neovim files" })
+			pickers = {
+				find_files = {
+					find_command = find_command,
+					hidden = true,
+				},
+			},
+		}
 	end,
 }
