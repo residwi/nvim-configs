@@ -21,7 +21,7 @@ return {
 				else
 					local ok, err = pcall(vim.cmd.cprev)
 					if not ok then
-						vim.notify(err, vim.log.levels.ERROR)
+						Snacks.notify.error(err)
 					end
 				end
 			end,
@@ -35,7 +35,7 @@ return {
 				else
 					local ok, err = pcall(vim.cmd.cnext)
 					if not ok then
-						vim.notify(err, vim.log.levels.ERROR)
+						Snacks.notify.error(err)
 					end
 				end
 			end,

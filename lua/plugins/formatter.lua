@@ -15,7 +15,7 @@ return {
 			},
 		},
 		opts = {
-			notify_on_error = false,
+			notify_on_error = true,
 			format_on_save = function(bufnr)
 				-- Disable autoformat on certain filetypes for languages that don't
 				-- have a well standardized coding style.
@@ -66,10 +66,10 @@ return {
 				if args.bang then
 					-- FormatDisable! will disable formatting just for this buffer
 					vim.b.disable_autoformat = true
-					vim.notify("Disabled auto-formatting on this buffer")
+					Snacks.notify.info("Disabled auto-formatting on this buffer")
 				else
 					vim.g.disable_autoformat = true
-					vim.notify("Disabled auto-formatting on global")
+					Snacks.notify.info("Disabled auto-formatting on global")
 				end
 			end, {
 				desc = "Disable autoformat-on-save",
@@ -80,7 +80,7 @@ return {
 				vim.b.disable_autoformat = false
 				vim.g.disable_autoformat = false
 
-				vim.notify("Enabled auto-formatting on global")
+				Snacks.notify.info("Enabled auto-formatting on global")
 			end, {
 				desc = "Re-enable autoformat-on-save",
 			})
