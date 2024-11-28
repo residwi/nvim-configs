@@ -6,11 +6,10 @@ function M.pick(kind)
 		local actions = require("CopilotChat.actions")
 		local items = actions[kind .. "_actions"]()
 		if not items then
-			vim.print("No " .. kind .. " found on the current line", "WarningMsg")
+			Snacks.notify.warn("No " .. kind .. " found on the current line")
 			return
 		end
-		local ok = pcall(require, "fzf-lua")
-		require("CopilotChat.integrations." .. (ok and "fzflua" or "telescope")).pick(items)
+		require("CopilotChat.integrations.telescope").pick(items)
 	end
 end
 
@@ -73,7 +72,6 @@ return {
 		},
 		config = function(_, opts)
 			local chat = require("CopilotChat")
-			require("CopilotChat.integrations.cmp").setup()
 
 			vim.api.nvim_create_autocmd("BufEnter", {
 				pattern = "copilot-chat",
