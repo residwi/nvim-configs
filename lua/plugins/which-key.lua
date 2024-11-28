@@ -1,6 +1,7 @@
 return {
 	"folke/which-key.nvim",
 	event = "VeryLazy",
+	commit = "68e37e12913a66b60073906f5d3f14dee0de19f2", -- commit before bug related to cannot linewise select in visual mode
 	opts = {
 		defaults = {},
 		spec = {
