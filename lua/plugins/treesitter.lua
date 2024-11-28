@@ -1,66 +1,137 @@
 return {
-	"nvim-treesitter/nvim-treesitter",
-	event = { "LazyFile", "VeryLazy" },
-	lazy = vim.fn.argc(-1) == 0,  -- load treesitter early when opening a file from the cmdline
-	build = ":TSUpdate",
-	dependencies = {
-		"RRethy/nvim-treesitter-endwise",
-		"nvim-treesitter/nvim-treesitter-textobjects",
-	},
-
-	opts = {
-		endwise = { enable = true },
-		ensure_installed = { "bash", "c", "diff", "html", "lua", "luadoc", "markdown", "vim", "vimdoc" },
-		-- Autoinstall languages that are not installed
-		auto_install = true,
-		highlight = {
-			enable = true,
-			-- Some languages depend on vim"s regex highlighting system (such as Ruby) for indent rules.
-			--  If you are experiencing weird indenting issues, add the language to
-			--  the list of additional_vim_regex_highlighting and disabled languages for indent.
-			additional_vim_regex_highlighting = { "ruby" },
+	{
+		"nvim-treesitter/nvim-treesitter",
+		version = false, -- last release is way too old and doesn't work on Windows
+		build = ":TSUpdate",
+		event = { "LazyFile", "VeryLazy" },
+		lazy = vim.fn.argc(-1) == 0, -- load treesitter early when opening a file from the cmdline
+		dependencies = {
+			"RRethy/nvim-treesitter-endwise",
 		},
-		indent = { enable = true, disable = { "ruby" } },
-		textobjects = {
-			select = {
+		init = function(plugin)
+			-- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
+			-- This is needed because a bunch of plugins no longer `require("nvim-treesitter")`, which
+			-- no longer trigger the **nvim-treesitter** module to be loaded in time.
+			-- Luckily, the only things that those plugins need are the custom queries, which we make available
+			-- during startup.
+			require("lazy.core.loader").add_to_rtp(plugin)
+			require("nvim-treesitter.query_predicates")
+		end,
+		cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
+		keys = {
+			{ "<c-space>", desc = "Increment Selection" },
+			{ "<bs>", desc = "Decrement Selection", mode = "x" },
+		},
+		opts_extend = { "ensure_installed" },
+
+		---@type TSConfig
+		---@diagnostic disable-next-line: missing-fields
+		opts = {
+			auto_install = true,
+			endwise = { enable = true },
+			highlight = { enable = true },
+			indent = { enable = true },
+			ensure_installed = {
+				"bash",
+				"c",
+				"diff",
+				"html",
+				"jsdoc",
+				"json",
+				"jsonc",
+				"lua",
+				"luadoc",
+				"luap",
+				"markdown",
+				"markdown_inline",
+				"printf",
+				"query",
+				"regex",
+				"toml",
+				"tsx",
+				"vim",
+				"vimdoc",
+				"xml",
+				"yaml",
+			},
+			incremental_selection = {
 				enable = true,
-				lookahead = true,
 				keymaps = {
-					-- You can use the capture groups defined in textobjects.scm
-					["af"] = "@function.outer",
-					["if"] = "@function.inner",
-					["ac"] = "@class.outer",
-					["ic"] = { query = "@class.inner", desc = "Select inner part of a class region" },
-					["as"] = { query = "@scope", query_group = "locals", desc = "Select language scope" },
+					init_selection = "<C-space>",
+					node_incremental = "<C-space>",
+					scope_incremental = "grc",
+					node_decremental = "<bs>",
 				},
-				-- You can choose the select mode (default is charwise 'v')
-				--
-				-- Can also be a function which gets passed a table with the keys
-				-- * query_string: eg '@function.inner'
-				-- * method: eg 'v' or 'o'
-				-- and should return the mode ('v', 'V', or '<c-v>') or a table
-				-- mapping query_strings to modes.
-				selection_modes = {
-					["@parameter.outer"] = "v", -- charwise
-					["@function.outer"] = "V", -- linewise
-					["@class.outer"] = "<c-v>", -- blockwise
+			},
+			textobjects = {
+				move = {
+					enable = true,
+					goto_next_start = {
+						["]f"] = "@function.outer",
+						["]c"] = "@class.outer",
+						["]a"] = "@parameter.inner",
+					},
+					goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer", ["]A"] = "@parameter.inner" },
+					goto_previous_start = {
+						["[f"] = "@function.outer",
+						["[c"] = "@class.outer",
+						["[a"] = "@parameter.inner",
+					},
+					goto_previous_end = {
+						["[F"] = "@function.outer",
+						["[C"] = "@class.outer",
+						["[A"] = "@parameter.inner",
+					},
 				},
-				-- If you set this to `true` (default is `false`) then any textobject is
-				-- extended to include preceding or succeeding whitespace. Succeeding
-				-- whitespace has priority in order to act similarly to eg the built-in
-				-- `ap`.
-				--
-				-- Can also be a function which gets passed a table with the keys
-				-- * query_string: eg '@function.inner'
-				-- * selection_mode: eg 'v'
-				-- and should return true or false
-				include_surrounding_whitespace = true,
 			},
 		},
+		---@param opts TSConfig
+		config = function(_, opts)
+			if type(opts.ensure_installed) == "table" then
+				opts.ensure_installed = Util.dedup(opts.ensure_installed)
+			end
+			require("nvim-treesitter.configs").setup(opts)
+		end,
 	},
-	config = function(_, opts)
-		-- Prefer git instead of curl in order to improve connectivity in some environments
-		require("nvim-treesitter.install").prefer_git = true
-		require("nvim-treesitter.configs").setup(opts)
-	end,
+
+	{
+		"nvim-treesitter/nvim-treesitter-textobjects",
+		event = "VeryLazy",
+		enabled = true,
+		config = function()
+			-- If treesitter is already loaded, we need to run config again for textobjects
+			if Util.is_loaded("nvim-treesitter") then
+				local opts = Util.opts("nvim-treesitter")
+				require("nvim-treesitter.configs").setup({ textobjects = opts.textobjects })
+			end
+
+			-- When in diff mode, we want to use the default
+			-- vim text objects c & C instead of the treesitter ones.
+			local move = require("nvim-treesitter.textobjects.move") ---@type table<string,fun(...)>
+			local configs = require("nvim-treesitter.configs")
+			for name, fn in pairs(move) do
+				if name:find("goto") == 1 then
+					move[name] = function(q, ...)
+						if vim.wo.diff then
+							local config = configs.get_module("textobjects.move")[name] ---@type table<string,string>
+							for key, query in pairs(config or {}) do
+								if q == query and key:find("[%]%[][cC]") then
+									vim.cmd("normal! " .. key)
+									return
+								end
+							end
+						end
+						return fn(q, ...)
+					end
+				end
+			end
+		end,
+	},
+
+	-- Automatically add closing tags for HTML and JSX
+	{
+		"windwp/nvim-ts-autotag",
+		event = "LazyFile",
+		opts = {},
+	},
 }
