@@ -8,7 +8,7 @@ return {
 		notifier = { enabled = true },
 		quickfile = { enabled = false },
 		statuscolumn = { enabled = false },
-		words = { enabled = false },
+		words = { enabled = true },
 		styles = {
 			notification = {
 				wo = { wrap = true } -- Wrap notifications
