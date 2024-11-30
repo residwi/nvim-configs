@@ -12,7 +12,7 @@ return {
 			local cmp = require("cmp")
 
 			return {
-				completion = { completeopt = "menu,menuone,preview,noinsert" },
+				completion = { completeopt = "menu,menuone,popup,noinsert" },
 
 				-- For an understanding of why these mappings were
 				-- chosen, you will need to read `:help ins-completion`
