@@ -29,7 +29,7 @@ return {
 		opts = {
 			auto_install = true,
 			endwise = { enable = true },
-			highlight = { enable = true },
+			highlight = { enable = true, additional_vim_regex_highlighting = { "ruby" } },
 			indent = { enable = true },
 			ensure_installed = {
 				"bash",
