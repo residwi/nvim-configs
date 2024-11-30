@@ -37,3 +37,6 @@ vim.keymap.set("v", "<C-n>", "y/\\V<C-R>=escape(@\",'/\\')<CR><CR>")
 
 -- Paste without replacing the current selection
 vim.keymap.set("x", "<leader>p", [["_dP`[v`]=]])
+
+-- Disable accidental command-line window
+vim.keymap.set("n", "q:", "<Nop>")
