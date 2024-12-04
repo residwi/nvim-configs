@@ -28,7 +28,6 @@ local prompts = {
 return {
 	{
 		"CopilotC-Nvim/CopilotChat.nvim",
-		branch = "canary",
 		cmd = "CopilotChat",
 		build = "make tiktoken", -- Only on MacOS or Linux
 		event = "VeryLazy",
