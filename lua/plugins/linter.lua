@@ -1,3 +1,16 @@
+local function rubocop_config()
+	local default_command = { cmd = "bundle", prepend_args = { "exec", "rubocop" } }
+
+	if Util.has_docker_compose() then
+		local combined_command = vim.list_extend({ default_command.cmd }, default_command.prepend_args)
+		local combined_args = vim.list_extend({ "compose", "exec", "lsp" }, combined_command)
+
+		return { cmd = "docker", prepend_args = combined_args }
+	else
+		return default_command
+	end
+end
+
 return {
 	{
 		"mfussenegger/nvim-lint",
@@ -27,21 +40,7 @@ return {
 			-- or add custom linters.
 			---@type table<string,table>
 			linters = {
-				rubocop = {
-					cmd = "bundle",
-					args = {
-						"exec",
-						"rubocop",
-						"--format",
-						"json",
-						"--force-exclusion",
-						"--server",
-						"--stdin",
-						function()
-							return vim.api.nvim_buf_get_name(0)
-						end,
-					},
-				},
+				rubocop = rubocop_config(),
 
 				-- -- Example of using selene only when a selene.toml file is present
 				-- selene = {

@@ -1,3 +1,16 @@
+local function rubocop_config()
+	local default_command = { command = "bundle", prepend_args = { "exec", "rubocop" } }
+
+	if Util.has_docker_compose() then
+		local combined_command = vim.list_extend({ default_command.command }, default_command.prepend_args)
+		local combined_args = vim.list_extend({ "compose", "exec", "lsp" }, combined_command)
+
+		return { command = "docker", prepend_args = combined_args }
+	else
+		return default_command
+	end
+end
+
 return {
 	{
 		"stevearc/conform.nvim",
@@ -52,10 +65,7 @@ return {
 
 			formatters = {
 				injected = { options = { ignore_errors = true } },
-				rubocop = {
-					command = "bundle",
-					prepend_args = { "exec", "rubocop" },
-				},
+				rubocop = rubocop_config(),
 			},
 		},
 		init = function()

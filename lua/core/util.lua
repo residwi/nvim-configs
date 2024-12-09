@@ -1,7 +1,7 @@
 local M = {}
 
 function M.is_win()
-  return vim.uv.os_uname().sysname:find("Windows") ~= nil
+	return vim.uv.os_uname().sysname:find("Windows") ~= nil
 end
 
 function M.is_loaded(name)
@@ -46,6 +46,11 @@ function M.opts(name)
 	end
 	local Plugin = require("lazy.core.plugin")
 	return Plugin.values(plugin, "opts", false)
+end
+
+function M.has_docker_compose()
+	local docker_compose_files = { "docker-compose.yaml", "docker-compose.yml", "compose.yaml", "compose.yml" }
+	return vim.fs.root(0, docker_compose_files)
 end
 
 return M
