@@ -38,3 +38,6 @@ vim.opt.smartcase = true -- if you include mixed case in your search, assumes yo
 
 -- Use tree style for netrw
 vim.g.netrw_liststyle = 3
+
+-- Disable snacks animations globally
+vim.g.snacks_animate = false
