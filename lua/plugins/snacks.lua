@@ -8,6 +8,7 @@ return {
 		notifier = { enabled = true },
 		quickfile = { enabled = false },
 		statuscolumn = { enabled = false },
+		indent = { enabled = true },
 		words = { enabled = true },
 		styles = {
 			notification = {
