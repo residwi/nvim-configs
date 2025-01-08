@@ -5,6 +5,8 @@ return {
 		priority = 1000,
 		opts = {
 			integrations = {
+				lsp_trouble = true,
+				mason = true,
 				native_lsp = {
 					underlines = {
 						errors = { "undercurl" },
@@ -14,6 +16,8 @@ return {
 						ok = { "undercurl" },
 					},
 				},
+				snacks = true,
+				which_key = true,
 			},
 		},
 		config = function(_, opts)
