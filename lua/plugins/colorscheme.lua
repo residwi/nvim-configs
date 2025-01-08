@@ -4,6 +4,12 @@ return {
 		name = "catppuccin",
 		priority = 1000,
 		opts = {
+			custom_highlights = function(C)
+				return {
+					SnacksIndent = { fg = C.surface0 },
+					SnacksIndentScope = { fg = C.overlay0 },
+				}
+			end,
 			integrations = {
 				lsp_trouble = true,
 				mason = true,
