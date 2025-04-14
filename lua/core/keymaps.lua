@@ -40,3 +40,6 @@ vim.keymap.set("x", "<leader>p", [["_dP`[v`]=]])
 
 -- Disable accidental command-line window
 vim.keymap.set("n", "q:", "<Nop>")
+
+-- Copy relative file path to clipboard
+vim.keymap.set("n", "<leader>cp", "<cmd>CopyRelPath<cr>", { desc = "Copy relative path" })
