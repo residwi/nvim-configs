@@ -87,9 +87,9 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 
 -- Copy the relative path of the current file to the clipboard
 vim.api.nvim_create_user_command("CopyRelPath", function()
-	local path = vim.fn.expand("%")
+	local path = vim.fn.expand("%:.")
 	vim.fn.setreg("+", path)
-	vim.notify('Copied "' .. path .. '" to the clipboard!')
+	vim.notify('Copied: "' .. path .. '" to the clipboard!')
 end, {
 	desc = "Copy the relative path of the current file to the clipboard",
 })
