@@ -13,6 +13,7 @@ return {
 			integrations = {
 				lsp_trouble = true,
 				mason = true,
+				blink_cmp = true,
 				native_lsp = {
 					underlines = {
 						errors = { "undercurl" },

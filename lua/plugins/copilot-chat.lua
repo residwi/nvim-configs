@@ -1,18 +1,3 @@
-local M = {}
-
----@param kind string
-function M.pick(kind)
-	return function()
-		local actions = require("CopilotChat.actions")
-		local items = actions[kind .. "_actions"]()
-		if not items then
-			Snacks.notify.warn("No " .. kind .. " found on the current line")
-			return
-		end
-		require("CopilotChat.integrations.telescope").pick(items)
-	end
-end
-
 local prompts = {
 	-- Code related prompts
 	Refactor = "/COPILOT_GENERATE\n\nPlease refactor the following code to improve its clarity and readability.",
@@ -75,8 +60,14 @@ return {
 				mode = { "n", "v" },
 			},
 			{ "<leader>aQ", "<cmd>CopilotChatInline<cr>", mode = "x", desc = "Inline chat (CopilotChat)" },
-			-- Show prompts actions with telescope
-			{ "<leader>ap", M.pick("prompt"), desc = "Prompt Actions (CopilotChat)", mode = { "n", "v" } },
+			{
+				"<leader>ap",
+				function()
+					require("CopilotChat").select_prompt()
+				end,
+				desc = "Prompt Actions (CopilotChat)",
+				mode = { "n", "v" },
+			},
 			-- Generate commit message based on the git diff
 			{
 				"<leader>ac",
@@ -99,6 +90,14 @@ return {
 		config = function(_, opts)
 			local chat = require("CopilotChat")
 			local select = require("CopilotChat.select")
+
+			vim.api.nvim_create_autocmd("BufEnter", {
+				pattern = "copilot-chat",
+				callback = function()
+					vim.opt_local.relativenumber = false
+					vim.opt_local.number = false
+				end,
+			})
 
 			chat.setup(opts)
 
