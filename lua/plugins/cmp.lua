@@ -1,118 +1,165 @@
 return {
 	{
-		"hrsh7th/nvim-cmp",
-		version = false, -- last release is way too old
-		event = "InsertEnter",
-		dependencies = {
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-buffer",
+		"saghen/blink.cmp",
+		version = "1.*",
+		opts_extend = {
+			"sources.completion.enabled_providers",
+			"sources.compat",
+			"sources.default",
 		},
-		opts = function()
-			local cmp = require("cmp")
+		dependencies = {
+			"rafamadriz/friendly-snippets",
+			-- add blink.compat to dependencies
+			{
+				"saghen/blink.compat",
+				optional = true, -- make optional so it's only enabled if any extras need it
+				opts = {},
+				version = "*",
+			},
+		},
+		event = "InsertEnter",
 
-			return {
-				completion = { completeopt = "menu,menuone,popup,noinsert" },
+		---@module 'blink.cmp'
+		---@type blink.cmp.Config
+		opts = {
+			snippets = {
+				expand = function(snippet, _)
+					return Util.cmp.expand(snippet)
+				end,
+			},
+			appearance = {
+				-- Sets the fallback highlight groups to nvim-cmp's highlight groups
+				-- useful for when your theme doesn't support blink.cmp
+				-- will be removed in a future release, assuming themes add support
+				use_nvim_cmp_as_default = false,
+				-- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+				-- adjusts spacing to ensure icons are aligned
+				nerd_font_variant = "mono",
+			},
+			completion = {
+				accept = {
+					auto_brackets = {
+						enabled = true,
+					},
+				},
+				menu = {
+					draw = {
+						treesitter = { "lsp" },
+						components = {
+							kind_icon = {
+								text = function(ctx)
+									if ctx.source_id ~= "lsp" then
+										return ctx.kind_icon
+									end
 
-				-- For an understanding of why these mappings were
-				-- chosen, you will need to read `:help ins-completion`
-				--
-				-- No, but seriously. Please read `:help ins-completion`, it is really good!
-				mapping = cmp.mapping.preset.insert({
-					["<C-n>"] = cmp.mapping.select_next_item(),
-					["<C-p>"] = cmp.mapping.select_prev_item(),
+									local kind_icon, _, _ = require("mini.icons").get("lsp", ctx.kind)
+									return kind_icon
+								end,
+								-- (optional) use highlights from mini.icons
+								highlight = function(ctx)
+									if ctx.source_id ~= "lsp" then
+										return ctx.kind_hl
+									end
 
-					-- Scroll the documentation window [b]ack / [f]orward
-					["<C-b>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<CR>"] = cmp.mapping.confirm({ select = true }),
+									local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
+									return hl
+								end,
+							},
+							kind = {
+								-- (optional) use highlights from mini.icons
+								highlight = function(ctx)
+									if ctx.source_id ~= "lsp" then
+										return ctx.kind_hl
+									end
 
-					-- If you prefer more traditional completion keymaps,
-					-- you can uncomment the following lines
-					--["<CR>"] = cmp.mapping.confirm { select = true },
-					--["<Tab>"] = cmp.mapping.select_next_item(),
-					--["<S-Tab>"] = cmp.mapping.select_prev_item(),
+									local _, hl, _ = require("mini.icons").get("lsp", ctx.kind)
+									return hl
+								end,
+							},
+						},
+					},
+				},
+				documentation = {
+					auto_show = true,
+					auto_show_delay_ms = 500,
+				},
+				ghost_text = {
+					enabled = vim.g.ai_cmp,
+				},
+			},
 
-					-- Manually trigger a completion from nvim-cmp.
-					--  Generally you don't need this, because nvim-cmp will display
-					--  completions whenever it has completion options available.
-					["<C-Space>"] = cmp.mapping.complete(),
-				}),
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "path" },
-				}, {
-						{ name = "buffer" },
-					}),
-			}
+			-- experimental signature help support
+			-- signature = { enabled = true },
+
+			sources = {
+				-- adding any nvim-cmp sources here will enable them
+				-- with blink.compat
+				compat = {},
+				default = { "lsp", "path", "snippets", "buffer" },
+			},
+
+			cmdline = {
+				enabled = false,
+			},
+
+			keymap = {
+				preset = "enter",
+				["<C-y>"] = { "select_and_accept" },
+			},
+		},
+		---@param opts blink.cmp.Config | { sources: { compat: string[] } }
+		config = function(_, opts)
+			-- setup compat sources
+			local enabled = opts.sources.default
+			for _, source in ipairs(opts.sources.compat or {}) do
+				opts.sources.providers[source] = vim.tbl_deep_extend(
+					"force",
+					{ name = source, module = "blink.compat.source" },
+					opts.sources.providers[source] or {}
+				)
+				if type(enabled) == "table" and not vim.tbl_contains(enabled, source) then
+					table.insert(enabled, source)
+				end
+			end
+
+			-- add ai_accept to <Tab> key
+			if not opts.keymap["<Tab>"] then
+				if opts.keymap.preset == "super-tab" then -- super-tab
+					opts.keymap["<Tab>"] = {
+						require("blink.cmp.keymap.presets")["super-tab"]["<Tab>"][1],
+						Util.cmp.map({ "snippet_forward", "ai_accept" }),
+						"fallback",
+					}
+				else -- other presets
+					opts.keymap["<Tab>"] = {
+						Util.cmp.map({ "snippet_forward", "ai_accept" }),
+						"fallback",
+					}
+				end
+			end
+
+			-- Unset custom prop to pass blink.cmp validation
+			opts.sources.compat = nil
+
+			require("blink.cmp").setup(opts)
 		end,
 	},
 
-	-- snippets
+	-- lazydev
 	{
-		"hrsh7th/nvim-cmp",
-		optional = true,
-		dependencies = {
-			{
-				"garymjr/nvim-snippets",
-				opts = {
-					friendly_snippets = true,
-				},
-				dependencies = { "rafamadriz/friendly-snippets" },
-				-- native snippets. only needed on < 0.11, as 0.11 creates these by default
-				keys = {
-					{
-						"<Tab>",
-						function()
-							if vim.snippet.active({ direction = 1 }) then
-								vim.schedule(function()
-									vim.snippet.jump(1)
-								end)
-								return
-							end
-							return "<Tab>"
-						end,
-						expr = true,
-						silent = true,
-						mode = "i",
-					},
-					{
-						"<Tab>",
-						function()
-							vim.schedule(function()
-								vim.snippet.jump(1)
-							end)
-						end,
-						expr = true,
-						silent = true,
-						mode = "s",
-					},
-					{
-						"<S-Tab>",
-						function()
-							if vim.snippet.active({ direction = -1 }) then
-								vim.schedule(function()
-									vim.snippet.jump(-1)
-								end)
-								return
-							end
-							return "<S-Tab>"
-						end,
-						expr = true,
-						silent = true,
-						mode = { "i", "s" },
+		"saghen/blink.cmp",
+		opts = {
+			sources = {
+				-- add lazydev to your completion providers
+				default = { "lazydev" },
+				providers = {
+					lazydev = {
+						name = "LazyDev",
+						module = "lazydev.integrations.blink",
+						score_offset = 100, -- show at a higher priority than lsp
 					},
 				},
 			},
 		},
-		opts = function(_, opts)
-			opts.snippet = {
-				expand = function(args)
-					return vim.snippet.expand(args.body)
-				end,
-			}
-
-			table.insert(opts.sources, { name = "snippets" })
-		end,
 	},
 }

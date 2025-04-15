@@ -22,7 +22,8 @@ local lazy_file_events = { "BufReadPost", "BufNewFile", "BufWritePre" }
 Event.mappings.LazyFile = { id = "LazyFile", event = lazy_file_events }
 Event.mappings["User LazyFile"] = Event.mappings.LazyFile
 
-_G.Util = require("core.util")
+_G.Util = require("utils")
+Util.format.setup()
 
 require("lazy").setup({
 	spec = {
