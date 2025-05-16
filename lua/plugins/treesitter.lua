@@ -20,6 +20,14 @@ return {
 		end,
 		cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
 		keys = {
+			{
+				"<leader>uI",
+				function()
+					vim.treesitter.inspect_tree()
+					vim.api.nvim_input("I")
+				end,
+				{ desc = "Inspect Tree" },
+			},
 			{ "<c-space>", desc = "Increment Selection" },
 			{ "<bs>", desc = "Decrement Selection", mode = "x" },
 		},
