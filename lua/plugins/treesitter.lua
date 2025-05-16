@@ -7,6 +7,7 @@ return {
 		lazy = vim.fn.argc(-1) == 0, -- load treesitter early when opening a file from the cmdline
 		dependencies = {
 			"RRethy/nvim-treesitter-endwise",
+			"windwp/nvim-ts-autotag",
 		},
 		init = function(plugin)
 			-- PERF: add nvim-treesitter queries to the rtp and it's custom query predicates early
@@ -53,6 +54,7 @@ return {
 				"vimdoc",
 				"xml",
 				"yaml",
+				"embedded_template",
 			},
 			incremental_selection = {
 				enable = true,
@@ -131,7 +133,14 @@ return {
 	-- Automatically add closing tags for HTML and JSX
 	{
 		"windwp/nvim-ts-autotag",
-		event = "LazyFile",
-		opts = {},
+		config = function()
+			require("nvim-ts-autotag").setup({
+				opts = {
+					enable_close = true, -- Auto close tags
+					enable_rename = true, -- Auto rename pairs of tags
+					enable_close_on_slash = true, -- Auto close on trailing </
+				},
+			})
+		end,
 	},
 }
