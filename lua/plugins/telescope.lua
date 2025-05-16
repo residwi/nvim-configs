@@ -40,7 +40,7 @@ return {
 	-- stylua: ignore
 	keys = {
 		{ "<C-p>", "<cmd>Telescope find_files<cr>" },
-		{ "<leader>fb", "<cmd>Telescope buffers sort_mru=true sort_lastused=true ignore_current_buffer=true<cr>", desc = "[F]ind [B]uffers" },
+		{ "<leader>fb", "<cmd>Telescope buffers sort_mru=true ignore_current_buffer=true<cr>", desc = "[F]ind [B]uffers" },
 		{ "<leader>fc", function() require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") }) end, { desc = "[F]ind [C]onfig Neovim files" }},
 		{ "<leader>fg", function() require("telescope.builtin").live_grep() end, { desc = "[F]ind [G]rep" }},
 		{ "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "[F]ind [H]elp" },
