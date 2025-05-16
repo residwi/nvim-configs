@@ -12,7 +12,7 @@ return {
 		dependencies = {
 			-- Automatically install LSPs and related tools to stdpath for Neovim
 			"mason.nvim", -- NOTE: Must be loaded before dependants
-			{ "williamboman/mason-lspconfig.nvim", config = function() end },
+			{ "mason-org/mason-lspconfig.nvim", config = function() end },
 
 			-- Useful status updates for LSP.
 			-- NOTE: `opts = {}` is the same as calling `require("fidget").setup({})`
@@ -176,7 +176,7 @@ return {
 			local have_mason, mlsp = pcall(require, "mason-lspconfig")
 			local all_mslp_servers = {}
 			if have_mason then
-				all_mslp_servers = vim.tbl_keys(require("mason-lspconfig.mappings.server").lspconfig_to_package)
+				all_mslp_servers = vim.tbl_keys(require("mason-lspconfig").get_mappings().lspconfig_to_package)
 			end
 
 			local ensure_installed = {} ---@type string[]
