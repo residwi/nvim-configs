@@ -115,7 +115,7 @@ function M.format(opts)
 	for _, formatter in ipairs(M.resolve(buf)) do
 		if formatter.active then
 			done = true
-			Util.try(function()
+			LazyUtil.try(function()
 				return formatter.format(buf)
 			end, { msg = "Formatter `" .. formatter.name .. "` failed" })
 		end
