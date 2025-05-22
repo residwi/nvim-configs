@@ -25,7 +25,7 @@ return {
 				sh = { "shfmt" },
 				go = { "goimports", "gofumpt" },
 				ruby = { "rubocop" },
-				eruby = { "rubocop" },
+				eruby = { "erb_lint" },
 				javascript = { "prettierd", "prettier", stop_after_first = true },
 				typescript = { "prettierd", "prettier", stop_after_first = true },
 				javascriptreact = { "prettierd", "prettier", stop_after_first = true },
@@ -42,6 +42,12 @@ return {
 				rubocop = {
 					command = "bundle",
 					prepend_args = { "exec", "rubocop" },
+				},
+				erb_lint = {
+					stdin = false,
+					tmpfile_format = ".conform.$RANDOM.$FILENAME",
+					command = "bundle",
+					args = { "exec", "erb_lint", "--autocorrect", "$FILENAME" },
 				},
 			},
 		},
