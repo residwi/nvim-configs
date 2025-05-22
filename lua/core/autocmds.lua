@@ -93,3 +93,9 @@ vim.api.nvim_create_user_command("CopyRelPath", function()
 end, {
 	desc = "Copy the relative path of the current file to the clipboard",
 })
+
+-- Auto set filetype for eruby.yaml files that are not detected correctly for highlighting
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "eruby.yaml",
+	command = "set filetype=yaml",
+})
