@@ -1,4 +1,4 @@
-local LazyUtil = require("lazy.core.util")
+LazyUtil = require("lazy.core.util")
 local M = {}
 
 setmetatable(M, {
