@@ -60,7 +60,7 @@ function M.has(buffer, method)
 	method = method:find("/") and method or "textDocument/" .. method
 	local clients = lsp_util.get_clients({ bufnr = buffer })
 	for _, client in ipairs(clients) do
-		if client.supports_method(method) then
+		if client.supports_method(method, buffer) then
 			return true
 		end
 	end
