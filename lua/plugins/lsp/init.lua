@@ -137,10 +137,23 @@ return {
 
 			vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
+			local ctx = { filename = vim.api.nvim_buf_get_name(0) }
+			ctx.dirname = vim.fn.fnamemodify(ctx.filename, ":h")
 			local servers = {}
+
 			for _, server in ipairs(opts.servers) do
 				local exists, lsp = pcall(require, "plugins.lsp.servers." .. server)
-				servers[server] = exists and lsp.config or {}
+				if exists and type(lsp) == "table" and lsp.config then
+					servers[server] = lsp.config
+
+					-- check if the server should be enabled based on the condition
+					local condition = lsp.config.condition
+					if type(condition) == "function" and not condition(ctx) then
+						servers[server] = {}
+					end
+				else
+					servers[server] = {}
+				end
 			end
 
 			local has_blink, blink = pcall(require, "blink.cmp")

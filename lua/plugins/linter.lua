@@ -23,29 +23,30 @@ return {
 				-- ['_'] = { 'fallback linter' },
 				-- ["*"] = { "typos" },
 			},
-			-- LazyVim extension to easily override linter options
-			-- or add custom linters.
 			---@type table<string,table>
 			linters = {
 				rubocop = {
-					cmd = "bundle",
-					args = {
-						"exec",
-						"rubocop",
-						"--format",
-						"json",
-						"--force-exclusion",
-						"--server",
-						"--stdin",
-						function()
-							return vim.api.nvim_buf_get_name(0)
-						end,
-					},
+					cmd = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
+						or vim.fn.expand("~/.asdf/shims/rubocop"),
+					args = vim.list_extend(
+						vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and { "exec", "rubocop" }
+							or {},
+						{
+							"--format",
+							"json",
+							"--force-exclusion",
+							"--server",
+							"--stdin",
+							function()
+								return vim.api.nvim_buf_get_name(0)
+							end,
+						}
+					),
 				},
 
 				-- -- Example of using selene only when a selene.toml file is present
 				-- selene = {
-				--   -- `condition` is another LazyVim extension that allows you to
+				--   -- `condition` is another extension that allows you to
 				--   -- dynamically enable/disable linters based on the context.
 				--   condition = function(ctx)
 				--     return vim.fs.find({ "selene.toml" }, { path = ctx.filename, upward = true })[1]
