@@ -40,14 +40,20 @@ return {
 			formatters = {
 				injected = { options = { ignore_errors = true } },
 				rubocop = {
-					command = "bundle",
-					prepend_args = { "exec", "rubocop" },
+					command = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
+						or vim.fn.expand("~/.asdf/shims/rubocop"),
+					prepend_args = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1
+							and { "exec", "rubocop", "--stdin", "$FILENAME" }
+						or {},
 				},
 				erb_lint = {
 					stdin = false,
 					tmpfile_format = ".conform.$RANDOM.$FILENAME",
-					command = "bundle",
-					args = { "exec", "erb_lint", "--autocorrect", "$FILENAME" },
+					command = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
+						or "erb_lint",
+					args = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1
+							and { "exec", "erb_lint", "--autocorrect", "$FILENAME" }
+						or { "--autocorrect", "$FILENAME" },
 				},
 			},
 		},
