@@ -43,6 +43,9 @@ return {
 						}
 					),
 				},
+        markdownlint = {
+          args = { "--disable", "MD013", "--stdin" },
+        },
 
 				-- -- Example of using selene only when a selene.toml file is present
 				-- selene = {
