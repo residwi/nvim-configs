@@ -15,7 +15,7 @@ return {
         enabled = false,
       },
     },
-    ft = { "markdown", "norg", "rmd", "org", "codecompanion" },
+    ft = { "markdown", "norg", "rmd", "org", "codecompanion", "copilot-chat" },
     config = function(_, opts)
       require("render-markdown").setup(opts)
       Snacks.toggle({
