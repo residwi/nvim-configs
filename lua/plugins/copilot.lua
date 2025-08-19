@@ -19,6 +19,9 @@ return {
         markdown = true,
         help = true,
       },
+      server = {
+        type = "binary",
+      },
     },
     config = function(_, opts)
       Util.cmp.actions.ai_accept = function()
