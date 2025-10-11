@@ -21,7 +21,7 @@ return {
   -- add mini.snippets
   desc = "Manage and expand snippets (alternative to Luasnip)",
   {
-    "echasnovski/mini.snippets",
+    "nvim-mini/mini.snippets",
     event = "InsertEnter", -- don't depend on other plugins to load...
     dependencies = "rafamadriz/friendly-snippets",
     opts = function()
