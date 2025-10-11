@@ -56,7 +56,7 @@ return {
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the folds.
       folds = {
-        enabled = true,
+        enabled = false,
       },
       -- add any global capabilities here
       capabilities = {
