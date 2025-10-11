@@ -44,18 +44,18 @@ return {
         }
       end,
       float = { transparent = true },
+      lsp_styles = {
+        underlines = {
+          errors = { "undercurl" },
+          hints = { "undercurl" },
+          warnings = { "undercurl" },
+          information = { "undercurl" },
+          ok = { "undercurl" },
+        },
+      },
       integrations = {
         lsp_trouble = true,
         mason = true,
-        native_lsp = {
-          underlines = {
-            errors = { "undercurl" },
-            hints = { "undercurl" },
-            warnings = { "undercurl" },
-            information = { "undercurl" },
-            ok = { "undercurl" },
-          },
-        },
         snacks = {
           enabled = true,
           indent_scope_color = "overlay0",
