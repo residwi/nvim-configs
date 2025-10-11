@@ -23,6 +23,7 @@ return {
         local function map(mode, l, r, opts)
           opts = opts or {}
           opts.buffer = bufnr
+          opts.silent = true
           vim.keymap.set(mode, l, r, opts)
         end
 
@@ -56,9 +57,9 @@ return {
         map("n", "<leader>hs", gitsigns.stage_hunk, { desc = "git [s]tage hunk" })
         map("n", "<leader>hr", gitsigns.reset_hunk, { desc = "git [r]eset hunk" })
         map("n", "<leader>hS", gitsigns.stage_buffer, { desc = "git [S]tage buffer" })
-        map("n", "<leader>hu", gitsigns.undo_stage_hunk, { desc = "git [u]ndo stage hunk" })
         map("n", "<leader>hR", gitsigns.reset_buffer, { desc = "git [R]eset buffer" })
         map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "git [p]review hunk inline" })
+        map("n", "<leader>hi", gitsigns.preview_hunk_inline, { desc = "git preview hunk [i]nline" })
         map("n", "<leader>hb", function()
           gitsigns.blame_line({ full = true })
         end, { desc = "git [b]lame line" })
@@ -70,7 +71,10 @@ return {
 
         -- Toggles
         map("n", "<leader>tb", gitsigns.toggle_current_line_blame, { desc = "[T]oggle git show [b]lame line" })
-        map("n", "<leader>tD", gitsigns.toggle_deleted, { desc = "[T]oggle git show [D]eleted" })
+        map("n", "<leader>tw", gitsigns.toggle_word_diff, { desc = "[T]oggle git word [w]iff" })
+
+        -- Text object
+        map({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", { desc = "select [h]unk" })
       end,
     },
   },
