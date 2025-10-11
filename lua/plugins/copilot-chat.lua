@@ -19,12 +19,6 @@ return {
         show_folds = false, -- Disable folding for cleaner look
         prompts = {
           -- Code related prompts
-          Refactor = {
-            prompt = "/COPILOT_BASE\n\nPlease refactor the following code to improve its clarity and readability.",
-          },
-          FixError = {
-            prompt = "/COPILOT_INSTRUCTIONS\n\nPlease explain the error in the following code and provide a solution.",
-          },
           BetterNamings = {
             prompt = "/COPILOT_INSTRUCTIONS\n\nPlease provide better names for the following variables and functions.",
           },
@@ -118,5 +112,25 @@ return {
 
       chat.setup(opts)
     end,
+  },
+
+  -- Blink integration
+  {
+    "saghen/blink.cmp",
+    optional = true,
+    ---@module 'blink.cmp'
+    ---@type blink.cmp.Config
+    opts = {
+      sources = {
+        providers = {
+          path = {
+            -- Path sources triggered by "/" interfere with CopilotChat commands
+            enabled = function()
+              return vim.bo.filetype ~= "copilot-chat"
+            end,
+          },
+        },
+      },
+    },
   },
 }
