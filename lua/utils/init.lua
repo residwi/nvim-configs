@@ -16,6 +16,16 @@ function M.is_win()
   return vim.uv.os_uname().sysname:find("Windows") ~= nil
 end
 
+---@param name string
+function M.get_plugin(name)
+  return require("lazy.core.config").spec.plugins[name]
+end
+
+---@param plugin string
+function M.has(plugin)
+  return M.get_plugin(plugin) ~= nil
+end
+
 function M.is_loaded(name)
   local Config = require("lazy.core.config")
   return Config.plugins[name] and Config.plugins[name]._.loaded
@@ -75,6 +85,41 @@ function M.on_very_lazy(fn)
       fn()
     end,
   })
+end
+
+local _defaults = {} ---@type table<string, boolean>
+-- Determines whether it's safe to set an option to a default value.
+--
+-- It will only set the option if:
+-- * it is the same as the global value
+-- * it's current value is a default value
+-- * it was last set by a script in $VIMRUNTIME
+---@param option string
+---@param value string|number|boolean
+---@return boolean was_set
+function M.set_default(option, value)
+  local l = vim.api.nvim_get_option_value(option, { scope = "local" })
+  local g = vim.api.nvim_get_option_value(option, { scope = "global" })
+
+  _defaults[("%s=%s"):format(option, value)] = true
+  local key = ("%s=%s"):format(option, l)
+
+  if l ~= g and not _defaults[key] then
+    -- Option does not match global and is not a default value
+    -- Check if it was set by a script in $VIMRUNTIME
+    local info = vim.api.nvim_get_option_info2(option, { scope = "local" })
+    ---@param e vim.fn.getscriptinfo.ret
+    local scriptinfo = vim.tbl_filter(function(e)
+      return e.sid == info.last_set_sid
+    end, vim.fn.getscriptinfo())
+    local by_rtp = #scriptinfo == 1 and vim.startswith(scriptinfo[1].name, vim.fn.expand("$VIMRUNTIME"))
+    if not by_rtp then
+      return false
+    end
+  end
+
+  vim.api.nvim_set_option_value(option, value, { scope = "local" })
+  return true
 end
 
 return M

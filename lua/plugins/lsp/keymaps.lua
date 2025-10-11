@@ -58,9 +58,9 @@ function M.has(buffer, method)
     return false
   end
   method = method:find("/") and method or "textDocument/" .. method
-  local clients = lsp_util.get_clients({ bufnr = buffer })
+  local clients = vim.lsp.get_clients({ bufnr = buffer })
   for _, client in ipairs(clients) do
-    if client.supports_method(method, buffer) then
+    if client:supports_method(method) then
       return true
     end
   end
@@ -75,7 +75,7 @@ function M.resolve(buffer)
   end
   local spec = vim.tbl_extend("force", {}, M.get())
   local opts = Util.opts("nvim-lspconfig")
-  local clients = lsp_util.get_clients({ bufnr = buffer })
+  local clients = vim.lsp.get_clients({ bufnr = buffer })
   for _, client in ipairs(clients) do
     local maps = opts.servers[client.name] and opts.servers[client.name].keys or {}
     vim.list_extend(spec, maps)
