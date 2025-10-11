@@ -17,7 +17,7 @@ return {
         version = "*",
       },
     },
-    event = "InsertEnter",
+    event = { "InsertEnter", "CmdlineEnter" },
 
     ---@module 'blink.cmp'
     ---@type blink.cmp.Config
@@ -99,7 +99,21 @@ return {
       },
 
       cmdline = {
-        enabled = false,
+        enabled = true,
+        keymap = {
+          preset = "cmdline",
+          ["<Right>"] = false,
+          ["<Left>"] = false,
+        },
+        completion = {
+          list = { selection = { preselect = false } },
+          menu = {
+            auto_show = function(ctx)
+              return vim.fn.getcmdtype() == ":"
+            end,
+          },
+          ghost_text = { enabled = true },
+        },
       },
 
       keymap = {
@@ -127,12 +141,12 @@ return {
         if opts.keymap.preset == "super-tab" then -- super-tab
           opts.keymap["<Tab>"] = {
             require("blink.cmp.keymap.presets").get("super-tab")["<Tab>"][1],
-            Util.cmp.map({ "snippet_forward", "ai_accept" }),
+            Util.cmp.map({ "snippet_forward", "ai_nes", "ai_accept" }),
             "fallback",
           }
         else -- other presets
           opts.keymap["<Tab>"] = {
-            Util.cmp.map({ "snippet_forward", "ai_accept" }),
+            Util.cmp.map({ "snippet_forward", "ai_nes", "ai_accept" }),
             "fallback",
           }
         end
@@ -150,8 +164,9 @@ return {
     "saghen/blink.cmp",
     opts = {
       sources = {
-        -- add lazydev to your completion providers
-        default = { "lazydev" },
+        per_filetype = {
+          lua = { inherit_defaults = true, "lazydev" },
+        },
         providers = {
           lazydev = {
             name = "LazyDev",
