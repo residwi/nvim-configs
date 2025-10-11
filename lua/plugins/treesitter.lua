@@ -37,7 +37,7 @@ return {
       endwise = { enable = true },
       highlight = { enable = true, additional_vim_regex_highlighting = { "ruby" } },
       indent = { enable = true },
-      folds = { enable = true },
+      folds = { enable = false },
       ensure_installed = {
         "bash",
         "c",
