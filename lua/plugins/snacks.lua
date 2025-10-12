@@ -10,7 +10,11 @@ return {
     picker = { enabled = true },
     scope = { enabled = true },
     scroll = { enabled = true },
-    statuscolumn = { enabled = true },
+    statuscolumn = {
+      enabled = true,
+      left = { "git", "sign" }, -- priority of signs on the left (high to low)
+      right = { "fold", "mark" }, -- priority of signs on the right (high to low)
+    },
     styles = {
       notification = {
         wo = { wrap = true }, -- Wrap notifications
