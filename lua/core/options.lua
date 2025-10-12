@@ -48,3 +48,8 @@ vim.g.ai_cmp = true
 
 -- set the default session options
 vim.o.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+
+-- Folds
+vim.opt.foldlevel = 99 -- open all folds by default
+vim.opt.foldmethod = "indent"
+vim.opt.foldtext = ""
