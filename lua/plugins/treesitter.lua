@@ -112,7 +112,15 @@ return {
         callback = function(ev)
           local ft, lang = ev.match, vim.treesitter.language.get_lang(ev.match)
           if not Util.treesitter.have(ft) then
-            return
+            local parsers = TS.get_available()
+            if not (parsers and vim.tbl_contains(parsers, lang)) then
+              return
+            end
+
+            -- Auto install parser based on filetype if not already installed
+            TS.install(lang, { summary = true }):await(function()
+              Util.treesitter.get_installed(true) -- refresh the installed langs
+            end)
           end
 
           ---@param feat string
