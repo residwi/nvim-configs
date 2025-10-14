@@ -34,14 +34,15 @@ return {
           else
             gitsigns.nav_hunk("next")
           end
-        end, "Next Hunk")
+        end, { desc = "Next hunk" })
+
         map("n", "[h", function()
           if vim.wo.diff then
             vim.cmd.normal({ "[c", bang = true })
           else
             gitsigns.nav_hunk("prev")
           end
-        end, "Prev Hunk")
+        end, { desc = "Prev Hunk" })
 
         -- Actions
         -- visual mode
