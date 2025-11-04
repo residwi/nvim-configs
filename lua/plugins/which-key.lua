@@ -5,7 +5,7 @@ return {
     defaults = {},
     spec = {
       {
-        mode = { "n", "v" },
+        mode = { "n", "x" },
         { "<leader><tab>", group = "tabs" },
         { "<leader>c", group = "code" },
         { "<leader>f", group = "file/find" },

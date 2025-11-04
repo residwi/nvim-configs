@@ -41,14 +41,14 @@ return {
       }
     end,
     keys = {
-      { "<leader>a", "", desc = "+ai", mode = { "n", "v" } },
+      { "<leader>a", "", desc = "+ai", mode = { "n", "x" } },
       {
         "<leader>aa",
         function()
           return require("CopilotChat").toggle()
         end,
         desc = "Toggle (CopilotChat)",
-        mode = { "n", "v" },
+        mode = { "n", "x" },
       },
       {
         "<leader>ax",
@@ -56,7 +56,7 @@ return {
           return require("CopilotChat").reset()
         end,
         desc = "Clear (CopilotChat)",
-        mode = { "n", "v" },
+        mode = { "n", "x" },
       },
       {
         "<leader>aq",
@@ -70,7 +70,7 @@ return {
           end)
         end,
         desc = "Quick Chat (CopilotChat)",
-        mode = { "n", "v" },
+        mode = { "n", "x" },
       },
       {
         "<leader>ap",
@@ -78,7 +78,7 @@ return {
           require("CopilotChat").select_prompt()
         end,
         desc = "Prompt Actions (CopilotChat)",
-        mode = { "n", "v" },
+        mode = { "n", "x" },
       },
       -- Generate commit message based on the git diff
       {
