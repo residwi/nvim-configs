@@ -10,7 +10,7 @@ return {
         function()
           Util.format.format({ force = true })
         end,
-        mode = { "n", "v" },
+        mode = { "n", "x" },
         desc = "[C]ode [F]ormat",
       },
     },

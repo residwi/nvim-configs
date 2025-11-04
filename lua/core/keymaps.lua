@@ -2,11 +2,11 @@ vim.g.mapleader = " "
 vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 -- Move line to up or down
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("x", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("x", "K", ":m '<-2<CR>gv=gv")
 
 -- Yanking to the system clipboard
-vim.keymap.set({ "n", "v" }, "<leader>y", [["+y]])
+vim.keymap.set({ "n", "x" }, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+Y]])
 
 -- Clear highlight search on pressing <Esc> in normal mode
@@ -33,7 +33,7 @@ vim.keymap.set("n", "<leader>bb", "<cmd>e #<CR>")
 vim.keymap.set("n", "<leader>`", "<cmd>e #<CR>")
 
 -- search selected text
-vim.keymap.set("v", "<C-n>", "y/\\V<C-R>=escape(@\",'/\\')<CR><CR>")
+vim.keymap.set("x", "<C-n>", "y/\\V<C-R>=escape(@\",'/\\')<CR><CR>")
 
 -- Paste without replacing the current selection
 vim.keymap.set("x", "<leader>p", [["_dP`[v`]=]])

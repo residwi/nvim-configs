@@ -46,10 +46,10 @@ return {
 
         -- Actions
         -- visual mode
-        map("v", "<leader>hs", function()
+        map("x", "<leader>hs", function()
           gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
         end, { desc = "stage git hunk" })
-        map("v", "<leader>hr", function()
+        map("x", "<leader>hr", function()
           gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
         end, { desc = "reset git hunk" })
 
