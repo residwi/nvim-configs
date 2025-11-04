@@ -5,6 +5,8 @@ local diagnotics_icons = {
   Info = " ",
 }
 
+local lsp_util = require("plugins.lsp.util")
+
 return {
   {
     "neovim/nvim-lspconfig",
@@ -18,6 +20,7 @@ return {
       -- NOTE: `opts = {}` is the same as calling `require("fidget").setup({})`
       { "j-hui/fidget.nvim", opts = {} },
     },
+    opts_extend = { "servers.*.keys" },
     opts = {
       -- options for vim.diagnostic.config()
       ---@type vim.diagnostic.Opts
@@ -58,15 +61,6 @@ return {
       folds = {
         enabled = true,
       },
-      -- add any global capabilities here
-      capabilities = {
-        workspace = {
-          fileOperations = {
-            didRename = true,
-            willRename = true,
-          },
-        },
-      },
       -- options for vim.lsp.buf.format
       -- `bufnr` and `filter` is handled by the formatter,
       -- but can be also overridden when specified
@@ -75,8 +69,41 @@ return {
         timeout_ms = nil,
       },
       -- LSP Server Settings
+      -- Sets the default configuration for an LSP client (or all clients if the special name "*" is used).
       ---@type table<string, vim.lsp.Config|{mason?:boolean, enabled?:boolean}|boolean>
       servers = {
+        -- configuration for all lsp servers
+        ["*"] = {
+          capabilities = {
+            workspace = {
+              fileOperations = {
+                didRename = true,
+                willRename = true,
+              },
+            },
+          },
+          -- stylua: ignore
+          keys = {
+            { "gd", vim.lsp.buf.definition, desc = "Goto Definition", has = "definition" },
+            { "gr", vim.lsp.buf.references, desc = "References", nowait = true },
+            { "gI", vim.lsp.buf.implementation, desc = "Goto Implementation" },
+            { "gy", vim.lsp.buf.type_definition, desc = "Goto T[y]pe Definition" },
+            { "gD", vim.lsp.buf.declaration, desc = "LSP: [G]oto [D]eclaration" },
+            { "K", function() return vim.lsp.buf.hover() end, desc = "LSP: Hover" },
+            { "gK", function() return vim.lsp.buf.signature_help() end, desc = "LSP: Signature Help", has = "signatureHelp" },
+            { "<c-k>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "LSP: Signature Help", has = "signatureHelp" },
+            { "<leader>ca", vim.lsp.buf.code_action, desc = "LSP: [C]ode [A]ction", mode = { "n", "x" }, has = "codeAction" },
+            { "<leader>cc", vim.lsp.codelens.run, desc = "LSP: Run Codelens", mode = { "n", "x" }, has = "codeLens" },
+            { "<leader>cC", vim.lsp.codelens.refresh, desc = "LSP: Refresh & Display Codelens", mode = { "n" }, has = "codeLens" },
+            { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File", mode = {"n"}, has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
+            { "<leader>cr", vim.lsp.buf.rename, desc = "LSP: [R]ename", has = "rename" },
+            { "<leader>cA", lsp_util.action.source, desc = "LSP: Source Action", has = "codeAction" },
+            { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight", desc = "LSP: Next Reference", enabled = function() return Snacks.words.is_enabled() end },
+            { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight", desc = "LSP: Prev Reference", enabled = function() return Snacks.words.is_enabled() end },
+            { "<A-n>", function() Snacks.words.jump(vim.v.count1, true) end, has = "documentHighlight", desc = "LSP: Next Reference", enabled = function() return Snacks.words.is_enabled() end },
+            { "<A-p>", function() Snacks.words.jump(-vim.v.count1, true) end, has = "documentHighlight", desc = "LSP: Prev Reference", enabled = function() return Snacks.words.is_enabled() end },
+          },
+        },
         gopls = {},
         ruby_lsp = {
           mason = false,
@@ -212,20 +239,19 @@ return {
     },
 
     config = vim.schedule_wrap(function(_, opts)
-      local lsp_util = require("plugins.lsp.util")
+      -- setup autoformat
       Util.format.register(lsp_util.formatter())
 
       -- setup keymaps
-      lsp_util.on_attach(function(client, buffer)
-        require("plugins.lsp.keymaps").on_attach(client, buffer)
-      end)
-
-      lsp_util.setup()
-      lsp_util.on_dynamic_capability(require("plugins.lsp.keymaps").on_attach)
+      for server, server_opts in pairs(opts.servers) do
+        if type(server_opts) == "table" and server_opts.keys then
+          require("plugins.lsp.keymaps").set({ name = server ~= "*" and server or nil }, server_opts.keys)
+        end
+      end
 
       -- inlay hints
       if opts.inlay_hints.enabled then
-        lsp_util.on_supports_method("textDocument/inlayHint", function(client, buffer)
+        Snacks.util.lsp.on({ method = "textDocument/inlayHint" }, function(buffer)
           if
             vim.api.nvim_buf_is_valid(buffer)
             and vim.bo[buffer].buftype == ""
@@ -238,7 +264,7 @@ return {
 
       -- folds
       if opts.folds.enabled then
-        lsp_util.on_supports_method("textDocument/foldingRange", function(client, buffer)
+        Snacks.util.lsp.on({ method = "textDocument/foldingRange" }, function()
           if Util.set_default("foldmethod", "expr") then
             Util.set_default("foldexpr", "v:lua.vim.lsp.foldexpr()")
           end
@@ -247,7 +273,7 @@ return {
 
       -- code lens
       if opts.codelens.enabled and vim.lsp.codelens then
-        lsp_util.on_supports_method("textDocument/codeLens", function(client, buffer)
+        Snacks.util.lsp.on({ method = "textDocument/codeLens" }, function(buffer)
           vim.lsp.codelens.refresh()
           vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
             buffer = buffer,
@@ -270,8 +296,8 @@ return {
 
       vim.diagnostic.config(vim.deepcopy(opts.diagnostics))
 
-      if opts.capabilities then
-        vim.lsp.config("*", { capabilities = opts.capabilities })
+      if opts.servers["*"] then
+        vim.lsp.config("*", opts.servers["*"])
       end
 
       -- get all the servers that are available through mason-lspconfig
@@ -283,6 +309,10 @@ return {
 
       ---@return boolean? exclude automatic setup
       local function configure(server)
+        if server == "*" then
+          return false
+        end
+
         local sopts = opts.servers[server]
         sopts = sopts == true and {} or (not sopts) and { enabled = false } or sopts --[[@as vim.lsp.Config|{mason?:boolean, enabled?:boolean}]]
 
