@@ -23,9 +23,7 @@ return {
     ---@type blink.cmp.Config
     opts = {
       snippets = {
-        expand = function(snippet, _)
-          return Util.cmp.expand(snippet)
-        end,
+        preset = "default",
       },
       appearance = {
         -- Sets the fallback highlight groups to nvim-cmp's highlight groups
@@ -123,6 +121,11 @@ return {
     },
     ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
     config = function(_, opts)
+      -- setup snippet expand for default preset
+      if opts.snippets and opts.snippets.preset == "default" then
+        opts.snippets.expand = Util.cmp.expand
+      end
+
       -- setup compat sources
       local enabled = opts.sources.default
       for _, source in ipairs(opts.sources.compat or {}) do
