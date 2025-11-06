@@ -1,5 +1,4 @@
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 
 -- Move line to up or down
 vim.keymap.set("x", "J", ":m '>+1<CR>gv=gv")
@@ -36,7 +35,7 @@ vim.keymap.set("n", "<leader>`", "<cmd>e #<CR>")
 vim.keymap.set("x", "<C-n>", "y/\\V<C-R>=escape(@\",'/\\')<CR><CR>")
 
 -- Paste without replacing the current selection
-vim.keymap.set("x", "<leader>p", [["_dP`[v`]=]])
+vim.keymap.set("x", "p", [["_dP`[v`]=]])
 
 -- Disable accidental command-line window
 vim.keymap.set("n", "q:", "<Nop>")
