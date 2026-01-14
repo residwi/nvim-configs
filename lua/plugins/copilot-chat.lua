@@ -7,7 +7,7 @@ return {
     opts = function()
       local user = vim.env.USER or "User"
       return {
-        model = "gpt-5-mini",
+        model = "gemini-3-pro-preview",
         window = {
           width = 0.4,
         },
