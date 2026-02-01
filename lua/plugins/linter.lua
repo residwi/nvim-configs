@@ -27,7 +27,7 @@ return {
       linters = {
         rubocop = {
           cmd = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
-            or vim.fn.expand("~/.asdf/shims/rubocop"),
+            or vim.fn.expand("~/.local/share/mise/shims/rubocop"),
           args = vim.list_extend(
             vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and { "exec", "rubocop" }
               or {},

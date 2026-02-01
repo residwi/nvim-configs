@@ -41,7 +41,7 @@ return {
         injected = { options = { ignore_errors = true } },
         rubocop = {
           command = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
-            or vim.fn.expand("~/.asdf/shims/rubocop"),
+            or vim.fn.expand("~/.local/share/mise/shims/rubocop"),
           prepend_args = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1
               and { "exec", "rubocop", "--stdin", "$FILENAME" }
             or {},

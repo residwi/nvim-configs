@@ -107,14 +107,14 @@ return {
         gopls = {},
         ruby_lsp = {
           mason = false,
-          cmd = { vim.fn.expand("~/.asdf/shims/ruby-lsp") },
+          cmd = { vim.fn.expand("~/.local/share/mise/shims/ruby-lsp") },
         },
         rubocop = {
           mason = false,
           -- Only run rubocop if a Gemfile is present in the project root
           cmd = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1
               and { "bundle", "exec", "rubocop", "--lsp" }
-            or { vim.fn.expand("~/.asdf/shims/rubocop"), "--lsp" },
+            or { vim.fn.expand("~/.local/share/mise/shims/rubocop"), "--lsp" },
         },
         tailwindcss = {
           settings = {
