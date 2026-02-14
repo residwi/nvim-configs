@@ -37,6 +37,7 @@ require("lazy").setup({
     { import = "plugins" },
     { import = "plugins.lsp.lang.typescript" },
     { import = "plugins.lsp.lang.go" },
+    { import = "plugins.lsp.lang.java" },
   },
   install = { colorscheme = { "catppuccin-mocha", "habamax" } },
 })
