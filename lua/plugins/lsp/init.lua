@@ -10,7 +10,7 @@ local lsp_util = require("plugins.lsp.util")
 return {
   {
     "neovim/nvim-lspconfig",
-    event = "LazyFile",
+    event = { "BufReadPre", "BufNewFile" },
     dependencies = {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       "mason.nvim", -- NOTE: Must be loaded before dependants
@@ -238,7 +238,7 @@ return {
       },
     },
 
-    config = vim.schedule_wrap(function(_, opts)
+    config = function(_, opts)
       -- setup autoformat
       Util.format.register(lsp_util.formatter())
 
@@ -341,7 +341,7 @@ return {
           automatic_enable = { exclude = mason_exclude },
         })
       end
-    end),
+    end,
   },
   {
     "b0o/SchemaStore.nvim",
