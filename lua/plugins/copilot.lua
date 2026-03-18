@@ -4,7 +4,6 @@ return {
     cmd = "Copilot",
     event = "BufReadPost",
     opts = {
-      copilot_model = "gpt-5-mini",
       suggestion = {
         enabled = not vim.g.ai_cmp,
         auto_trigger = true,
