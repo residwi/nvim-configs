@@ -98,6 +98,18 @@ return {
             { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File", mode = {"n"}, has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
             { "<leader>cr", vim.lsp.buf.rename, desc = "LSP: [R]ename", has = "rename" },
             { "<leader>cA", lsp_util.action.source, desc = "LSP: Source Action", has = "codeAction" },
+            {
+              "<leader>co",
+              lsp_util.action["source.organizeImports"],
+              desc = "LSP: Organize Imports",
+              has = "codeAction",
+              enabled = function(buf)
+                local code_actions = vim.tbl_filter(function(action)
+                  return action:find("^source%.organizeImports%.?$")
+                end, lsp_util.code_actions({ bufnr = buf }))
+                return #code_actions > 0
+              end
+            },
             { "]]", function() Snacks.words.jump(vim.v.count1) end, has = "documentHighlight", desc = "LSP: Next Reference", enabled = function() return Snacks.words.is_enabled() end },
             { "[[", function() Snacks.words.jump(-vim.v.count1) end, has = "documentHighlight", desc = "LSP: Prev Reference", enabled = function() return Snacks.words.is_enabled() end },
             { "<A-n>", function() Snacks.words.jump(vim.v.count1, true) end, has = "documentHighlight", desc = "LSP: Next Reference", enabled = function() return Snacks.words.is_enabled() end },
@@ -243,7 +255,10 @@ return {
       Util.format.register(lsp_util.formatter())
 
       -- setup keymaps
-      for server, server_opts in pairs(opts.servers) do
+      local names = vim.tbl_keys(opts.servers) ---@type string[]
+      table.sort(names)
+      for _, server in ipairs(names) do
+        local server_opts = opts.servers[server]
         if type(server_opts) == "table" and server_opts.keys then
           require("plugins.lsp.keymaps").set({ name = server ~= "*" and server or nil }, server_opts.keys)
         end
