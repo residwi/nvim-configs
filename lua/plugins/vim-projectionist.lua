@@ -8,6 +8,7 @@ return {
     "go",
     "phyton",
     "c",
+    "java",
   },
   config = function()
     vim.g.projectionist_heuristics = {
@@ -77,6 +78,30 @@ return {
           type = "test",
           template = {
             "package {basename|camelcase}",
+          },
+        },
+      },
+
+      -- Java
+      ["pom.xml|build.gradle|build.gradle.kts|settings.gradle|*.java"] = {
+        ["src/main/java/*.java"] = {
+          alternate = "src/test/java/{}Test.java",
+          type = "source",
+          template = {
+            "package {dirname|dot};",
+            "",
+            "public class {basename} {",
+            "}",
+          },
+        },
+        ["src/test/java/*Test.java"] = {
+          alternate = "src/main/java/{}.java",
+          type = "test",
+          template = {
+            "package {dirname|dot};",
+            "",
+            "public class {basename}Test {",
+            "}",
           },
         },
       },
