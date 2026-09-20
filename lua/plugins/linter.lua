@@ -29,8 +29,7 @@ return {
           cmd = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
             or vim.fn.expand("~/.local/share/mise/shims/rubocop"),
           args = vim.list_extend(
-            vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and { "exec", "rubocop" }
-              or {},
+            vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and { "exec", "rubocop" } or {},
             {
               "--format",
               "json",
@@ -60,13 +59,19 @@ return {
     config = function(_, opts)
       local M = {}
 
+      local function list_prepend(dst, src)
+        for i = 1, #src do
+          table.insert(dst, i, src[i])
+        end
+      end
+
       local lint = require("lint")
       for name, linter in pairs(opts.linters) do
         if type(linter) == "table" and type(lint.linters[name]) == "table" then
           lint.linters[name] = vim.tbl_deep_extend("force", lint.linters[name], linter)
           if type(linter.prepend_args) == "table" then
             lint.linters[name].args = lint.linters[name].args or {}
-            vim.list_extend(lint.linters[name].args, linter.prepend_args)
+            list_prepend(lint.linters[name].args, linter.prepend_args)
           end
         else
           lint.linters[name] = linter
