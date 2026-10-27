@@ -20,7 +20,6 @@ local settings = {
       parameterNames = { enabled = "literals" },
       parameterTypes = { enabled = true },
       propertyDeclarationTypes = { enabled = true },
-      variableTypes = { enabled = false },
     },
   },
 }

@@ -9,7 +9,6 @@ vim.opt.breakindent = true
 vim.opt.smartindent = true
 
 vim.opt.swapfile = false
-vim.opt.backup = false
 vim.opt.undofile = true
 
 -- Keep signcolumn on by default

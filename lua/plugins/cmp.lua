@@ -51,7 +51,6 @@ return {
 
       cmdline = {
         keymap = {
-          preset = "cmdline",
           ["<Right>"] = false,
           ["<Left>"] = false,
         },

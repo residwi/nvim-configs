@@ -143,7 +143,6 @@ return {
     opts = {
       move = {
         enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
         -- extention to create buffer-local keymaps
         keys = {
           goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer", ["]a"] = "@parameter.inner" },

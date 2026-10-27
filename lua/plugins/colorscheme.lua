@@ -8,11 +8,9 @@ return {
         -- https://github.com/catppuccin/nvim/pull/804#pullrequestreview-3080755868
         local O = require("catppuccin").options
         return {
-          ["@variable.member"] = { fg = C.lavender }, -- For fields.
           ["@module"] = { fg = C.lavender, style = O.styles.miscs or { "italic" } }, -- For identifiers referring to modules and namespaces.
           ["@string.special.url"] = { fg = C.rosewater, style = { "italic", "underline" } }, -- urls, links and emails
           ["@type.builtin"] = { fg = C.yellow, style = O.styles.properties or { "italic" } }, -- For builtin types.
-          ["@property"] = { fg = C.lavender, style = O.styles.properties or {} }, -- Same as TSField.
           ["@constructor"] = { fg = C.sapphire }, -- For constructor calls and definitions: = { } in Lua, and Java constructors.
           ["@keyword.operator"] = { link = "Operator" }, -- For new keyword operator
           ["@keyword.export"] = { fg = C.sky, style = O.styles.keywords },

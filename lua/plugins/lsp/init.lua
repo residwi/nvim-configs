@@ -177,14 +177,12 @@ return {
           settings = {
             Lua = {
               workspace = {
-                checkThirdParty = false,
+                checkThirdParty = "Disable",
               },
               completion = {
                 callSnippet = "Replace",
               },
               hint = {
-                setType = false,
-                paramType = true,
                 paramName = "Disable",
                 arrayIndex = "Disable",
               },
@@ -204,20 +202,10 @@ return {
           settings = {
             json = {
               validate = { enable = true },
-              format = { enable = true },
             },
           },
         },
         yamlls = {
-          -- Have to add this for yamlls to understand that we support line folding
-          capabilities = {
-            textDocument = {
-              foldingRange = {
-                dynamicRegistration = false,
-                lineFoldingOnly = true,
-              },
-            },
-          },
           -- lazy-load schemastore when needed
           before_init = function(_, new_config)
             new_config.settings.yaml.schemas = vim.tbl_deep_extend(
@@ -227,11 +215,7 @@ return {
             )
           end,
           settings = {
-            redhat = { telemetry = { enabled = false } },
             yaml = {
-              keyOrdering = false,
-              format = { enable = true },
-              validate = true,
               schemaStore = {
                 -- You must disable built-in schemaStore support if you want to use
                 -- this plugin and its advanced options like `ignore`.
