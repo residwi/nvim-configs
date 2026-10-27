@@ -105,14 +105,20 @@ return {
         { event = events.FILE_RENAMED, handler = on_move },
       })
       require("neo-tree").setup(opts)
-      --  vim.api.nvim_create_autocmd("TermClose", {
-      --    pattern = "*lazygit",
-      --    callback = function()
-      --      if package.loaded["neo-tree.sources.git_status"] then
-      --        require("neo-tree.sources.git_status").refresh()
-      --      end
-      --    end,
-      --  })
+
+      -- Refresh git markers after commits/stages made in lazygit
+      vim.api.nvim_create_autocmd("TermClose", {
+        group = vim.api.nvim_create_augroup("neotree_lazygit_refresh", { clear = true }),
+        pattern = "*lazygit",
+        callback = function()
+          local manager = require("neo-tree.sources.manager")
+          for _, source in ipairs({ "filesystem", "git_status" }) do
+            if package.loaded["neo-tree.sources." .. source] then
+              manager.refresh(source)
+            end
+          end
+        end,
+      })
     end,
   },
   { "MunifTanjim/nui.nvim", lazy = true },
