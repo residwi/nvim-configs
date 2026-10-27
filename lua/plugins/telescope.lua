@@ -10,7 +10,7 @@ return {
   {
     "nvim-telescope/telescope.nvim",
     version = false, -- telescope did only one release, so use HEAD for now
-    event = "VimEnter",
+    cmd = "Telescope",
     dependencies = {
       "nvim-lua/plenary.nvim",
       {

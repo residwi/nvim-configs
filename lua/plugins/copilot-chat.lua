@@ -1,9 +1,22 @@
 return {
   {
     "CopilotC-Nvim/CopilotChat.nvim",
-    cmd = "CopilotChat",
+    -- prompt commands (Explain, Fix...) are only created by setup(), so list the ones typed by hand
+    cmd = {
+      "CopilotChat",
+      "CopilotChatOpen",
+      "CopilotChatToggle",
+      "CopilotChatModels",
+      "CopilotChatPrompts",
+      "CopilotChatLoad",
+      "CopilotChatExplain",
+      "CopilotChatReview",
+      "CopilotChatFix",
+      "CopilotChatTests",
+      "CopilotChatCommit",
+      "CopilotChatRefactor",
+    },
     build = "make tiktoken", -- Only on MacOS or Linux
-    event = "VeryLazy",
     opts = function()
       local user = vim.env.USER or "User"
       return {

@@ -3,13 +3,13 @@ return {
   priority = 1000,
   lazy = false,
   opts = {
+    bigfile = { enabled = true },
     notifier = { enabled = true },
     indent = { enabled = true },
     input = { enabled = true },
     quickfile = { enabled = true },
     picker = { enabled = true },
     scope = { enabled = true },
-    scroll = { enabled = true },
     statuscolumn = {
       enabled = true,
       left = { "git", "sign" }, -- priority of signs on the left (high to low)

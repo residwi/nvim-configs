@@ -44,6 +44,12 @@ require("lazy").setup({
     { import = "plugins.lsp.lang.java" },
   },
   install = { colorscheme = { "catppuccin-mocha", "habamax" } },
+  rocks = { enabled = false },
+  performance = {
+    rtp = {
+      disabled_plugins = { "gzip", "tarPlugin", "tutor", "zipPlugin" },
+    },
+  },
 })
 
 vim.cmd.colorscheme("catppuccin-mocha")

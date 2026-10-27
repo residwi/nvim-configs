@@ -1,5 +1,7 @@
 return {
   "mason-org/mason.nvim",
+  -- loaded on demand by nvim-lspconfig (BufReadPre) / conform, or via a :Mason* command
+  cmd = { "Mason", "MasonInstall", "MasonUninstall", "MasonUninstallAll", "MasonUpdate", "MasonLog" },
   build = ":MasonUpdate",
   opts_extend = { "ensure_installed" },
   opts = {
