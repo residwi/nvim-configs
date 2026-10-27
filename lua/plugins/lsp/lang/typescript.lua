@@ -1,5 +1,4 @@
 local settings = {
-  complete_function_calls = true,
   vtsls = {
     enableMoveToFileCodeAction = true,
     autoUseWorkspaceTsdk = true,

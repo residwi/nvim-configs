@@ -34,11 +34,10 @@ return {
         html = { "prettierd", "prettier", stop_after_first = true },
         json = { "prettierd", "prettier", stop_after_first = true },
         yaml = { "prettierd", "prettier", stop_after_first = true },
-        markdown = { "prettierd", "prettier", "markdownlint", stop_after_first = true },
+        markdown = { "prettierd", "prettier", stop_after_first = true },
         python = { "isort", "black" },
       },
       formatters = {
-        injected = { options = { ignore_errors = true } },
         -- Use `bundle exec` when the file's project has a Gemfile (resolved per buffer, not from startup cwd)
         rubocop = {
           command = function(_, ctx)
@@ -54,6 +53,8 @@ return {
         },
         erb_lint = {
           stdin = false,
+          -- erb_lint exits 1 whenever it found offenses, even after autocorrecting them
+          exit_codes = { 0, 1 },
           command = function(_, ctx)
             return vim.fs.root(ctx.dirname, "Gemfile") and "bundle" or "erb_lint"
           end,

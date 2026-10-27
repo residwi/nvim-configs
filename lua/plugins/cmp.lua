@@ -59,7 +59,7 @@ return {
           list = { selection = { preselect = false } },
           menu = {
             auto_show = function(ctx)
-              return vim.fn.getcmdtype() == ":"
+              return ctx.mode == "cmdwin" or vim.fn.getcmdtype() == ":"
             end,
           },
         },
@@ -67,7 +67,7 @@ return {
 
       keymap = {
         preset = "enter",
-        ["<C-y>"] = { "select_and_accept" },
+        ["<C-y>"] = { "select_and_accept", "fallback" },
       },
     },
     ---@param opts blink.cmp.Config

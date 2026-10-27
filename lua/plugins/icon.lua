@@ -17,8 +17,9 @@ return {
       [".go-version"] = { glyph = "", hl = "MiniIconsBlue" },
     },
     filetype = {
-      dotenv = { glyph = "", hl = "MiniIconsYellow" },
-      gotmpl = { glyph = "󰟓", hl = "MiniIconsGrey" },
+      env = { glyph = "", hl = "MiniIconsYellow" },
+      gotexttmpl = { glyph = "󰟓", hl = "MiniIconsGrey" },
+      gohtmltmpl = { glyph = "󰟓", hl = "MiniIconsGrey" },
     },
   },
   init = function()

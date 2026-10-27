@@ -8,7 +8,6 @@ return {
         "lazy.nvim",
         -- `vim.uv` types ship with Neovim 0.12 ($VIMRUNTIME/lua/uv/_meta.lua)
         { path = "snacks.nvim", words = { "Snacks" } },
-        { path = "nvim-lspconfig", words = { "lspconfig.settings" } },
       },
     },
   },

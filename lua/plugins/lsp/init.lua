@@ -121,7 +121,16 @@ return {
         gopls = {},
         ruby_lsp = {
           mason = false,
-          cmd = { vim.fn.expand("~/.local/share/mise/shims/ruby-lsp") },
+          -- like lspconfig's default cmd (start in the project root), but with the mise shim
+          cmd = function(dispatchers, config)
+            return vim.lsp.rpc.start({ vim.fn.expand("~/.local/share/mise/shims/ruby-lsp") }, dispatchers, {
+              cwd = config.cmd_cwd or config.root_dir,
+              env = config.cmd_env,
+              detached = config.detached,
+            })
+          end,
+          -- RuboCop diagnostics come from the rubocop server; don't report them twice
+          init_options = { linters = {} },
         },
         rubocop = {
           mason = false,
@@ -155,7 +164,6 @@ return {
         html = {},
         cssls = {},
         dockerls = {},
-        docker_compose_language_service = {},
         -- stylua is installed by mason for conform; don't also run it as an LSP
         stylua = { enabled = false },
         lua_ls = {
@@ -173,9 +181,6 @@ return {
               },
               completion = {
                 callSnippet = "Replace",
-              },
-              doc = {
-                privateName = { "^_" },
               },
               hint = {
                 setType = false,
@@ -231,8 +236,6 @@ return {
                 -- You must disable built-in schemaStore support if you want to use
                 -- this plugin and its advanced options like `ignore`.
                 enable = false,
-                -- Avoid TypeError: Cannot read properties of undefined (reading 'length')
-                url = "",
               },
             },
           },

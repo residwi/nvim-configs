@@ -16,7 +16,7 @@ function M.pairs(opts)
   pairs.setup(opts)
   local open = pairs.open
   pairs.open = function(pair, neigh_pattern)
-    if vim.fn.getcmdline() ~= "" then
+    if vim.fn.mode() == "c" then
       return open(pair, neigh_pattern)
     end
     local o, c = pair:sub(1, 1), pair:sub(2, 2)
