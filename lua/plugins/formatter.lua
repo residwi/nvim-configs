@@ -97,7 +97,6 @@ return {
     "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
-        "rubocop",
         "prettierd",
         "prettier",
         "isort",

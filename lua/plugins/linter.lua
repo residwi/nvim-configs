@@ -5,15 +5,11 @@ return {
     opts = {
       -- Event to trigger linters
       events = { "BufWritePost", "BufReadPost", "InsertLeave" },
+      -- ruby (rubocop) and js/ts (eslint) are linted by their LSP servers, see lsp/init.lua
       linters_by_ft = {
         sh = { "shellcheck" },
-        ruby = { "rubocop" },
         eruby = { "erb_lint" },
         markdown = { "markdownlint" },
-        javascript = { "eslint_d" },
-        typescript = { "eslint_d" },
-        javascriptreact = { "eslint_d" },
-        typescriptreact = { "eslint_d" },
         python = { "pylint" },
         dockerfile = { "hadolint" },
 
@@ -25,23 +21,6 @@ return {
       },
       ---@type table<string,table>
       linters = {
-        rubocop = {
-          cmd = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
-            or vim.fn.expand("~/.local/share/mise/shims/rubocop"),
-          args = vim.list_extend(
-            vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and { "exec", "rubocop" } or {},
-            {
-              "--format",
-              "json",
-              "--force-exclusion",
-              "--server",
-              "--stdin",
-              function()
-                return vim.api.nvim_buf_get_name(0)
-              end,
-            }
-          ),
-        },
         markdownlint = {
           args = { "--disable", "MD013", "--stdin" },
         },
@@ -136,10 +115,8 @@ return {
     opts = {
       ensure_installed = {
         "shellcheck",
-        "rubocop",
         "erb-lint",
         "markdownlint",
-        "eslint_d",
         "pylint",
         "hadolint",
       },
