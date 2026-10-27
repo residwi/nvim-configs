@@ -2,7 +2,5 @@ return {
   "kylechui/nvim-surround",
   version = "*",
   event = "VeryLazy",
-  config = function()
-    require("nvim-surround").setup({})
-  end,
+  -- no setup() needed since v4; default keymaps come from its plugin/ file
 }

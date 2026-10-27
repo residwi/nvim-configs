@@ -19,14 +19,11 @@ return {
         markdown = true,
         help = true,
       },
-      server = {
-        type = "binary",
-      },
     },
     config = function(_, opts)
       Util.cmp.actions.ai_accept = function()
         if require("copilot.suggestion").is_visible() then
-          Util.create_undo()
+          -- accept() creates its own undo breakpoint
           require("copilot.suggestion").accept()
           return true
         end

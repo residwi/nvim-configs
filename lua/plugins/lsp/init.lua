@@ -169,9 +169,6 @@ return {
               workspace = {
                 checkThirdParty = false,
               },
-              codeLens = {
-                enable = true,
-              },
               completion = {
                 callSnippet = "Replace",
               },
@@ -179,26 +176,19 @@ return {
                 privateName = { "^_" },
               },
               hint = {
-                enable = true,
                 setType = false,
                 paramType = true,
                 paramName = "Disable",
-                semicolon = "Disable",
                 arrayIndex = "Disable",
               },
-              diagnostics = {
-                -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-                -- disable = { "missing-fields" },
-                globals = { "vim" },
-              },
+              -- diagnostics = {
+              --   -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
+              --   disable = { "missing-fields" },
+              -- },
             },
           },
         },
-        eslint = {
-          settings = {
-            workingDirectories = { mode = "auto" },
-          },
-        },
+        eslint = {},
         jsonls = {
           before_init = function(_, new_config)
             new_config.settings.json.schemas = new_config.settings.json.schemas or {}

@@ -53,19 +53,14 @@ return {
           ok = { "undercurl" },
         },
       },
+      -- other integrations are auto-detected from lazy.nvim (`auto_integrations`)
       integrations = {
-        lsp_trouble = true,
-        mason = true,
         snacks = {
           enabled = true,
           indent_scope_color = "overlay0",
         },
-        which_key = true,
       },
     },
-    config = function(_, opts)
-      require("catppuccin").setup(opts)
-    end,
   },
   -- {
   --   "olimorris/onedarkpro.nvim",

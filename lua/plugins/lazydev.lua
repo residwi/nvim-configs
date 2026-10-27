@@ -6,7 +6,7 @@ return {
     opts = {
       library = {
         "lazy.nvim",
-        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        -- `vim.uv` types ship with Neovim 0.12 ($VIMRUNTIME/lua/uv/_meta.lua)
         { path = "snacks.nvim", words = { "Snacks" } },
         { path = "nvim-lspconfig", words = { "lspconfig.settings" } },
       },

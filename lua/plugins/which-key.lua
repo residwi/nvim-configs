@@ -2,7 +2,6 @@ return {
   "folke/which-key.nvim",
   event = "VeryLazy",
   opts = {
-    defaults = {},
     spec = {
       {
         mode = { "n", "x" },
@@ -53,8 +52,4 @@ return {
       desc = "Window Hydra Mode (which-key)",
     },
   },
-  config = function(_, opts)
-    local wk = require("which-key")
-    wk.setup(opts)
-  end,
 }
