@@ -39,21 +39,31 @@ return {
       },
       formatters = {
         injected = { options = { ignore_errors = true } },
+        -- Use `bundle exec` when the file's project has a Gemfile (resolved per buffer, not from startup cwd)
         rubocop = {
-          command = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
-            or vim.fn.expand("~/.local/share/mise/shims/rubocop"),
-          prepend_args = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1
-              and { "exec", "rubocop", "--stdin", "$FILENAME" }
-            or {},
+          command = function(_, ctx)
+            return vim.fs.root(ctx.dirname, "Gemfile") and "bundle"
+              or vim.fn.expand("~/.local/share/mise/shims/rubocop")
+          end,
+          prepend_args = function(_, ctx)
+            return vim.fs.root(ctx.dirname, "Gemfile") and { "exec", "rubocop" } or {}
+          end,
+          cwd = function(_, ctx)
+            return vim.fs.root(ctx.dirname, "Gemfile")
+          end,
         },
         erb_lint = {
           stdin = false,
-          tmpfile_format = ".conform.$RANDOM.$FILENAME",
-          command = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1 and "bundle"
-            or "erb_lint",
-          args = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1
-              and { "exec", "erb_lint", "--autocorrect", "$FILENAME" }
-            or { "--autocorrect", "$FILENAME" },
+          command = function(_, ctx)
+            return vim.fs.root(ctx.dirname, "Gemfile") and "bundle" or "erb_lint"
+          end,
+          args = function(_, ctx)
+            return vim.fs.root(ctx.dirname, "Gemfile") and { "exec", "erb_lint", "--autocorrect", "$FILENAME" }
+              or { "--autocorrect", "$FILENAME" }
+          end,
+          cwd = function(_, ctx)
+            return vim.fs.root(ctx.dirname, "Gemfile")
+          end,
         },
       },
     },

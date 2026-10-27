@@ -142,6 +142,15 @@ return {
       attach_jdtls()
     end,
   },
+  -- nvim-jdtls starts jdtls itself; keep mason-lspconfig from enabling a second one
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        jdtls = { enabled = false },
+      },
+    },
+  },
   {
     "mason-org/mason.nvim",
     opts = {

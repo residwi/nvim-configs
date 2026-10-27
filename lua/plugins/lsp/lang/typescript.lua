@@ -1,7 +1,37 @@
+local settings = {
+  complete_function_calls = true,
+  vtsls = {
+    enableMoveToFileCodeAction = true,
+    autoUseWorkspaceTsdk = true,
+    experimental = {
+      maxInlayHintLength = 30,
+      completion = {
+        enableServerSideFuzzyMatch = true,
+      },
+    },
+  },
+  typescript = {
+    updateImportsOnFileMove = { enabled = "always" },
+    suggest = {
+      completeFunctionCalls = true,
+    },
+    inlayHints = {
+      enumMemberValues = { enabled = true },
+      functionLikeReturnTypes = { enabled = true },
+      parameterNames = { enabled = "literals" },
+      parameterTypes = { enabled = true },
+      propertyDeclarationTypes = { enabled = true },
+      variableTypes = { enabled = false },
+    },
+  },
+}
+-- copy typescript settings to javascript
+settings.javascript = vim.tbl_deep_extend("force", {}, settings.typescript, settings.javascript or {})
+
 return {
+  -- Provides `:VtsExec` in vtsls buffers
   {
     "yioneko/nvim-vtsls",
-    lazy = true,
     ft = {
       "javascript",
       "javascriptreact",
@@ -10,51 +40,27 @@ return {
       "typescriptreact",
       "typescript.tsx",
     },
-    keys = {
-      { "gD", "<cmd>VtsExec goto_source_definition<cr>", desc = "Goto Source Definition" },
-      { "gR", "<cmd>VtsExec file_references<cr>", desc = "File References" },
-      { "<leader>co", "<cmd>VtsExec organize_imports<cr>", desc = "Organize Imports" },
-      { "<leader>cM", "<cmd>VtsExec add_missing_imports<cr>", desc = "Add missing imports" },
-      { "<leader>cu", "<cmd>VtsExec remove_unused_imports<cr>", desc = "Remove unused imports" },
-      { "<leader>cD", "<cmd>VtsExec fix_all<cr>", desc = "Fix all diagnostics" },
-      { "<leader>cV", "<cmd>VtsExec select_ts_version<cr>", desc = "Select TS workspace version" },
-    },
-    opts = function()
-      local settings = {
-        complete_function_calls = true,
+  },
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
         vtsls = {
-          enableMoveToFileCodeAction = true,
-          autoUseWorkspaceTsdk = true,
-          experimental = {
-            maxInlayHintLength = 30,
-            completion = {
-              enableServerSideFuzzyMatch = true,
-            },
+          -- server settings must live in the LSP config; `require("vtsls").config()` only takes plugin options
+          settings = settings,
+          -- buffer-local, only where vtsls is attached
+          keys = {
+            { "gD", "<cmd>VtsExec goto_source_definition<cr>", desc = "Goto Source Definition" },
+            { "gR", "<cmd>VtsExec file_references<cr>", desc = "File References" },
+            { "<leader>co", "<cmd>VtsExec organize_imports<cr>", desc = "Organize Imports" },
+            { "<leader>cM", "<cmd>VtsExec add_missing_imports<cr>", desc = "Add missing imports" },
+            { "<leader>cu", "<cmd>VtsExec remove_unused_imports<cr>", desc = "Remove unused imports" },
+            { "<leader>cD", "<cmd>VtsExec fix_all<cr>", desc = "Fix all diagnostics" },
+            { "<leader>cV", "<cmd>VtsExec select_ts_version<cr>", desc = "Select TS workspace version" },
           },
         },
-        typescript = {
-          updateImportsOnFileMove = { enabled = "always" },
-          suggest = {
-            completeFunctionCalls = true,
-          },
-          inlayHints = {
-            enumMemberValues = { enabled = true },
-            functionLikeReturnTypes = { enabled = true },
-            parameterNames = { enabled = "literals" },
-            parameterTypes = { enabled = true },
-            propertyDeclarationTypes = { enabled = true },
-            variableTypes = { enabled = false },
-          },
-        },
-      }
-      -- copy typescript settings to javascript
-      settings.javascript = vim.tbl_deep_extend("force", {}, settings.typescript, settings.javascript or {})
-
-      return settings
-    end,
-    config = function(_, opts)
-      require("vtsls").config(opts)
-    end,
+      },
+    },
   },
   {
     "mason-org/mason.nvim",

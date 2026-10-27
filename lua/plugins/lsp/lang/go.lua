@@ -1,22 +1,60 @@
 return {
-  "ray-x/go.nvim",
-  lazy = true,
-  dependencies = {
-    "ray-x/guihua.lua",
-    "neovim/nvim-lspconfig",
-    "nvim-treesitter/nvim-treesitter",
+  {
+    "ray-x/go.nvim",
+    dependencies = {
+      "ray-x/guihua.lua",
+      "neovim/nvim-lspconfig",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    ft = { "go", "gomod" },
+    -- Formatting is done by conform (goimports + gofumpt), and inlay hints / codelens by lsp/init.lua (native 0.12).
+    -- go.nvim's defaults would turn inlay hints on for every buffer and run its own codelens refresh.
+    opts = {
+      lsp_inlay_hints = { enable = false },
+      lsp_codelens = false,
+    },
   },
-  ft = { "go", "gomod" },
-  config = function(_, opts)
-    require("go").setup(opts)
-
-    local format_sync_grp = vim.api.nvim_create_augroup("GoFormat", {})
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      pattern = "*.go",
-      callback = function()
-        require("go.format").goimports()
-      end,
-      group = format_sync_grp,
-    })
-  end,
+  {
+    "neovim/nvim-lspconfig",
+    opts = {
+      servers = {
+        gopls = {
+          settings = {
+            gopls = {
+              gofumpt = true,
+              codelenses = {
+                gc_details = false,
+                generate = true,
+                regenerate_cgo = true,
+                run_govulncheck = true,
+                test = true,
+                tidy = true,
+                upgrade_dependency = true,
+                vendor = true,
+              },
+              hints = {
+                assignVariableTypes = true,
+                compositeLiteralFields = true,
+                compositeLiteralTypes = true,
+                constantValues = true,
+                functionTypeParameters = true,
+                parameterNames = true,
+                rangeVariableTypes = true,
+              },
+              analyses = {
+                nilness = true,
+                unusedparams = true,
+                unusedwrite = true,
+                useany = true,
+              },
+              usePlaceholders = true,
+              completeUnimported = true,
+              staticcheck = true,
+              directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
+            },
+          },
+        },
+      },
+    },
+  },
 }

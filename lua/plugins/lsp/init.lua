@@ -123,10 +123,18 @@ return {
         },
         rubocop = {
           mason = false,
-          -- Only run rubocop if a Gemfile is present in the project root
-          cmd = vim.fn.filereadable(vim.fs.joinpath(vim.fn.getcwd(), "Gemfile")) == 1
-              and { "bundle", "exec", "rubocop", "--lsp" }
-            or { vim.fn.expand("~/.local/share/mise/shims/rubocop"), "--lsp" },
+          -- Use the project's rubocop (bundle exec) when its root has a Gemfile, resolved per client
+          cmd = function(dispatchers, config)
+            local root = config.root_dir
+            local cmd = root and vim.uv.fs_stat(vim.fs.joinpath(root, "Gemfile"))
+                and { "bundle", "exec", "rubocop", "--lsp" }
+              or { vim.fn.expand("~/.local/share/mise/shims/rubocop"), "--lsp" }
+            return vim.lsp.rpc.start(cmd, dispatchers, {
+              cwd = config.cmd_cwd or root,
+              env = config.cmd_env,
+              detached = config.detached,
+            })
+          end,
         },
         tailwindcss = {
           settings = {
@@ -146,6 +154,8 @@ return {
         cssls = {},
         dockerls = {},
         docker_compose_language_service = {},
+        -- stylua is installed by mason for conform; don't also run it as an LSP
+        stylua = { enabled = false },
         lua_ls = {
           -- mason = false, -- set to false if you don't want this server to be installed with mason
 
