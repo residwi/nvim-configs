@@ -6,7 +6,7 @@ return {
     "typescript",
     "typescriptreact",
     "go",
-    "phyton",
+    "python",
     "c",
     "java",
   },

@@ -16,12 +16,6 @@ vim.keymap.set("n", "<C-c>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 
--- Move to window using the <ctrl> hjkl keys
-vim.keymap.set("n", "<C-h>", "<C-w>h")
-vim.keymap.set("n", "<C-j>", "<C-w>j")
-vim.keymap.set("n", "<C-k>", "<C-w>k")
-vim.keymap.set("n", "<C-l>", "<C-w>l")
-
 -- buffers
 vim.keymap.set("n", "<leader>bd", "<cmd>bd<CR>")
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<CR>")
@@ -34,8 +28,18 @@ vim.keymap.set("n", "<leader>`", "<cmd>e #<CR>")
 -- search selected text
 vim.keymap.set("x", "<C-n>", "y/\\V<C-R>=escape(@\",'/\\')<CR><CR>")
 
--- Paste without replacing the current selection
-vim.keymap.set("x", "p", [["_dP`[v`]=]])
+-- Paste without replacing the current selection (native `P` keeps the register)
+vim.keymap.set("x", "p", [[P`[v`]=]])
+
+-- Incremental selection (built-in treesitter/LSP `an`/`in`).
+-- mini.ai overrides `an`/`in` when it loads, so copy them first. See `:h MiniAi-default-an-in`.
+local function copy_keymap(mode, from_lhs, to_lhs, desc)
+  local keymap = vim.fn.maparg(from_lhs, mode, false, true)
+  vim.keymap.set(mode, to_lhs, keymap.callback or keymap.rhs, { desc = desc })
+end
+copy_keymap("x", "an", "<C-Space>", "Increment Selection")
+copy_keymap("x", "in", "<BS>", "Decrement Selection")
+vim.keymap.set("n", "<C-Space>", "v<C-Space>", { remap = true, desc = "Increment Selection" })
 
 -- Disable accidental command-line window
 vim.keymap.set("n", "q:", "<Nop>")

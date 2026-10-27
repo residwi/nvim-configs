@@ -5,9 +5,10 @@ return {
   keys = {
     { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
     { "<leader>xX", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", desc = "Buffer Diagnostics (Trouble)" },
-    { "<leader>cs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
+    -- <leader>cs/<leader>cS are taken by the buffer-local LSP symbol pickers (telescope.lua)
+    { "<leader>xs", "<cmd>Trouble symbols toggle focus=false<cr>", desc = "Symbols (Trouble)" },
     {
-      "<leader>cS",
+      "<leader>xS",
       "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
       desc = "LSP references/definitions/... (Trouble)",
     },

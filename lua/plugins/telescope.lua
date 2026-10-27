@@ -40,8 +40,8 @@ return {
     keys = {
       { "<C-p>", "<cmd>Telescope find_files<cr>" },
       { "<leader>fb", "<cmd>Telescope buffers sort_mru=true ignore_current_buffer=true<cr>", desc = "[F]ind [B]uffers" },
-      { "<leader>fc", function() require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") }) end, { desc = "[F]ind [C]onfig Neovim files" }},
-      { "<leader>fg", function() require("telescope.builtin").live_grep() end, { desc = "[F]ind [G]rep" }},
+      { "<leader>fc", function() require("telescope.builtin").find_files({ cwd = vim.fn.stdpath("config") }) end, desc = "[F]ind [C]onfig Neovim files" },
+      { "<leader>fg", function() require("telescope.builtin").live_grep() end, desc = "[F]ind [G]rep" },
       { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "[F]ind [H]elp" },
       { "<leader>fw", "<cmd>Telescope grep_string<cr>",mode = {"n", "x"}, desc = "[F]ind selection [W]ord" },
       {
@@ -50,7 +50,7 @@ return {
           require("telescope.builtin").current_buffer_fuzzy_find(
             require("telescope.themes").get_dropdown({ winblend = 10, previewer = false })
           )
-        end, { desc = "[/] Fuzzily search in current buffer" }
+        end, desc = "[/] Fuzzily search in current buffer"
       },
       { "<leader>gc", "<cmd>Telescope git_commits<CR>", desc = "Commits" },
     },

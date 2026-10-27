@@ -21,7 +21,10 @@ return {
         prompts = {
           -- Code related prompts
           BetterNamings = {
-            prompt = "/COPILOT_INSTRUCTIONS\n\nPlease provide better names for the following variables and functions.",
+            prompt = "Please provide better names for the following variables and functions.",
+          },
+          Refactor = {
+            prompt = "Please refactor the following code to improve its clarity and readability.",
           },
 
           -- Text related prompts
@@ -93,7 +96,7 @@ return {
       { "<leader>ar", "<cmd>CopilotChatRefactor<cr>", desc = "Refactor code (CopilotChat)" },
       { "<leader>an", "<cmd>CopilotChatBetterNamings<cr>", desc = "Better Naming (CopilotChat)" },
       -- Debug
-      { "<leader>ad", "<cmd>CopilotChatDebugInfo<cr>", desc = "Debug Info (CopilotChat)" },
+      { "<leader>ad", "<cmd>checkhealth CopilotChat<cr>", desc = "Debug Info (CopilotChat)" },
       -- Fix the issue with diagnostic
       { "<leader>af", "<cmd>CopilotChatFix<cr>", desc = "Fix (CopilotChat)" },
       -- Copilot Chat Models

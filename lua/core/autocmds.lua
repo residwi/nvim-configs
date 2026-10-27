@@ -96,6 +96,7 @@ end, {
 
 -- Auto set filetype for eruby.yaml files that are not detected correctly for highlighting
 vim.api.nvim_create_autocmd("FileType", {
+  group = augroup("eruby_yaml"),
   pattern = "eruby.yaml",
   command = "set filetype=yaml",
 })
