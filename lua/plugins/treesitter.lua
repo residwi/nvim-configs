@@ -32,8 +32,6 @@ return {
     ---@alias lazyvim.TSFeat { enable?: boolean, disable?: string[] }
     ---@class lazyvim.TSConfig: TSConfig
     opts = {
-      auto_install = true,
-      endwise = { enable = true },
       highlight = { enable = true, additional_vim_regex_highlighting = { "ruby" } },
       indent = { enable = true },
       folds = { enable = true },
@@ -133,6 +131,10 @@ return {
           -- highlighting
           if enabled("highlight", "highlights") then
             pcall(vim.treesitter.start, ev.buf)
+            -- treesitter.start() disables regex syntax; re-enable it where plugins need it (e.g. vim-rails)
+            if vim.tbl_contains(opts.highlight.additional_vim_regex_highlighting or {}, lang) then
+              vim.bo[ev.buf].syntax = "ON"
+            end
           end
 
           -- indents
@@ -235,6 +237,19 @@ return {
   },
   {
     "RRethy/nvim-treesitter-endwise",
-    lazy = true,
+    event = "LazyFile",
+    config = function()
+      require("nvim-treesitter.endwise")
+      -- shortcut: upstream `endwise!` assumes match[id] is a TSNode, but on Nvim 0.11+ it is a TSNode[],
+      -- so <CR> after a Ruby heredoc errors. Re-register a fixed copy; drop once fixed upstream.
+      vim.treesitter.query.add_directive("endwise!", function(match, _, _, predicate, metadata)
+        local suffix = match[predicate[3]]
+        metadata.endwise_end_text = predicate[2]
+        metadata.endwise_end_suffix = type(suffix) == "table" and suffix[#suffix] or suffix
+        metadata.endwise_end_node_type = predicate[4]
+        metadata.endwise_shiftcount = predicate[5] or 1
+        metadata.endwise_end_suffix_pattern = predicate[6] or "^.*$"
+      end, { force = true })
+    end,
   },
 }
