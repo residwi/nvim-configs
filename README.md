@@ -4,7 +4,7 @@ My personal Neovim configuration
 
 ## Prerequisite
 
-- [neovim](https://neovim.io/) (>= 0.10)
+- [neovim](https://neovim.io/) (>= 0.12)
 - [ripgrep](https://github.com/BurntSushi/ripgrep): A fast line-oriented search tool.
 - [fzf](https://github.com/junegunn/fzf): A command-line fuzzy finder.
 

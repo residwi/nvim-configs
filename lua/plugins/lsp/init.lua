@@ -94,7 +94,7 @@ return {
             { "<c-k>", function() return vim.lsp.buf.signature_help() end, mode = "i", desc = "LSP: Signature Help", has = "signatureHelp" },
             { "<leader>ca", vim.lsp.buf.code_action, desc = "LSP: [C]ode [A]ction", mode = { "n", "x" }, has = "codeAction" },
             { "<leader>cc", vim.lsp.codelens.run, desc = "LSP: Run Codelens", mode = { "n", "x" }, has = "codeLens" },
-            { "<leader>cC", vim.lsp.codelens.refresh, desc = "LSP: Refresh & Display Codelens", mode = { "n" }, has = "codeLens" },
+            { "<leader>cC", function() vim.lsp.codelens.enable(not vim.lsp.codelens.is_enabled({ bufnr = 0 }), { bufnr = 0 }) end, desc = "LSP: Toggle Codelens", mode = { "n" }, has = "codeLens" },
             { "<leader>cR", function() Snacks.rename.rename_file() end, desc = "Rename File", mode = {"n"}, has = { "workspace/didRenameFiles", "workspace/willRenameFiles" } },
             { "<leader>cr", vim.lsp.buf.rename, desc = "LSP: [R]ename", has = "rename" },
             { "<leader>cA", lsp_util.action.source, desc = "LSP: Source Action", has = "codeAction" },
@@ -286,15 +286,9 @@ return {
         end)
       end
 
-      -- code lens
-      if opts.codelens.enabled and vim.lsp.codelens then
-        Snacks.util.lsp.on({ method = "textDocument/codeLens" }, function(buffer)
-          vim.lsp.codelens.refresh()
-          vim.api.nvim_create_autocmd({ "BufEnter", "CursorHold", "InsertLeave" }, {
-            buffer = buffer,
-            callback = vim.lsp.codelens.refresh,
-          })
-        end)
+      -- code lens (refreshes automatically since Neovim 0.12)
+      if opts.codelens.enabled then
+        vim.lsp.codelens.enable(true)
       end
 
       -- diagnostics

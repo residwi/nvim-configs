@@ -202,7 +202,7 @@ return {
               end
               require("nvim-treesitter-textobjects.move")[method](query, "textobjects")
             end, {
-              buffer = buf,
+              buf = buf,
               desc = desc,
               silent = true,
             })
