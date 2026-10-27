@@ -19,37 +19,24 @@ return {
     opts = {
       servers = {
         gopls = {
+          -- Only non-default values; see https://go.dev/gopls/settings
           settings = {
             gopls = {
               gofumpt = true,
-              codelenses = {
-                gc_details = false,
-                generate = true,
-                regenerate_cgo = true,
-                run_govulncheck = true,
-                test = true,
-                tidy = true,
-                upgrade_dependency = true,
-                vendor = true,
-              },
+              usePlaceholders = true,
+              -- other lenses (generate, tidy, vendor, ...) are on by default
+              codelenses = { test = true },
+              -- https://go.dev/gopls/inlayHints
               hints = {
                 assignVariableTypes = true,
                 compositeLiteralFields = true,
                 compositeLiteralTypes = true,
                 constantValues = true,
                 functionTypeParameters = true,
+                ignoredError = true,
                 parameterNames = true,
                 rangeVariableTypes = true,
               },
-              analyses = {
-                nilness = true,
-                unusedparams = true,
-                unusedwrite = true,
-                useany = true,
-              },
-              usePlaceholders = true,
-              completeUnimported = true,
-              directoryFilters = { "-.git", "-.vscode", "-.idea", "-.vscode-test", "-node_modules" },
             },
           },
         },
