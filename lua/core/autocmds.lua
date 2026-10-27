@@ -11,6 +11,28 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+-- Show LSP progress as native progress messages (cmdline, statusline, terminal progress bar).
+-- Source: `:h LspProgress`
+vim.api.nvim_create_autocmd("LspProgress", {
+  group = augroup("lsp_progress"),
+  callback = function(ev)
+    local value = ev.data.params.value
+    -- JSON null arrives as vim.NIL, which nvim_echo rejects
+    local function field(v)
+      return v ~= vim.NIL and v or nil
+    end
+    vim.api.nvim_echo({ { field(value.message) or (value.kind == "end" and "done" or "") } }, false, {
+      -- progress tokens are only unique per client
+      id = ("lsp.%d.%s"):format(ev.data.client_id, ev.data.params.token),
+      kind = "progress",
+      source = "vim.lsp",
+      title = field(value.title),
+      status = value.kind ~= "end" and "running" or "success",
+      percent = field(value.percentage),
+    })
+  end,
+})
+
 -- Check if we need to reload the file when it changed
 vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup("checktime"),

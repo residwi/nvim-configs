@@ -15,10 +15,6 @@ return {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       "mason.nvim", -- NOTE: Must be loaded before dependants
       { "mason-org/mason-lspconfig.nvim", config = function() end },
-
-      -- Useful status updates for LSP.
-      -- NOTE: `opts = {}` is the same as calling `require("fidget").setup({})`
-      { "j-hui/fidget.nvim", opts = {} },
     },
     opts_extend = { "servers.*.keys" },
     opts = {
@@ -41,6 +37,12 @@ return {
             [vim.diagnostic.severity.INFO] = diagnotics_icons.Info,
           },
         },
+        -- open the diagnostic float after jumping with ]d / [d
+        jump = {
+          on_jump = function(_, bufnr)
+            vim.diagnostic.open_float({ bufnr = bufnr, scope = "cursor", focus = false })
+          end,
+        },
       },
       -- Enable this to enable the builtin LSP inlay hints on Neovim.
       -- Be aware that you also will need to properly configure your LSP server to
@@ -53,7 +55,7 @@ return {
       -- Be aware that you also will need to properly configure your LSP server to
       -- provide the code lenses.
       codelens = {
-        enabled = false,
+        enabled = true,
       },
       -- Enable this to enable the builtin LSP folding on Neovim.
       -- Be aware that you also will need to properly configure your LSP server to

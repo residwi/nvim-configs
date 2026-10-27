@@ -53,3 +53,9 @@ require("lazy").setup({
 })
 
 vim.cmd.colorscheme("catppuccin-mocha")
+
+-- Built-in opt-in plugins: `:Undotree` and `:DiffTool`.
+-- Added after lazy.nvim, since its setup resets the runtimepath.
+-- Note: nvim.difftool also takes over `nvim -d dirA dirB` (directory diff UI).
+vim.cmd.packadd("nvim.undotree")
+vim.cmd.packadd("nvim.difftool")
